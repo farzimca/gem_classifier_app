@@ -20,8 +20,11 @@ app.use(express.static("public"))
 app.use(cookieParser())
 
 import router from "./routes/authRoutes.js";
+import predictionRouter from "./routes/prediction.routes.js";
 
 app.use('/api/v1/users', router)
+
+app.use("/api/v1/predictions", predictionRouter);
 
 
 export default app;

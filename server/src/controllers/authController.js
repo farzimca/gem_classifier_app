@@ -265,3 +265,29 @@ export const AvatarUpdate = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, myUser, `Avatar Updated Successfully`));
 });
+
+export const UpdateUser = asyncHandler(async (req, res) => {
+  const { fullname, email } = req.body;
+
+  if (!fullname && !email) {
+    throw new ApiError(400, "At least one field (fullname or email) is required to update.");
+  }
+
+  const myUser = await User
+    .findByIdAndUpdate(
+      req.myUser._id,
+      {
+        $set: {
+          fullname,
+          email,
+        },
+      },
+
+      { new: true } // this will return after updated ===> new data that is updated using this query
+    )
+    .select("-password"); // will return user without password
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, myUser, "User Updated Successfully"));
+});
