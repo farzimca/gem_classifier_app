@@ -21,10 +21,12 @@ app.use(cookieParser())
 
 import router from "./routes/authRoutes.js";
 import predictionRouter from "./routes/prediction.routes.js";
+import favoriteRouter from "./routes/favorite.routes.js"
 
 app.use('/api/v1/users', router)
 
 app.use("/api/v1/predictions", predictionRouter);
 
+app.use("/api/v1/favorites", favoriteRouter);
 
 export default app;
