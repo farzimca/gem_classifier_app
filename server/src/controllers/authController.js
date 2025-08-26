@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/Cloudinary.js";
 import { ApiError } from "../utils/ApiErrors.js";
+import { sendEmail } from '../utils/sendMail.js';
 import { ApiResponse } from "../utils/ApiResponse.js";
 import {asyncHandler} from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
@@ -48,6 +49,98 @@ export const register = asyncHandler(async (req, res) => {
     await deleteOnCloudinary(avatar.public_id);
     throw new ApiError(500, "Error while registering user");
   }
+
+  //Node Mail
+
+  // In your user.controller.js (or wherever you handle registration)
+
+const welcomeSubject = `Welcome to GEMX! 🎉`;
+
+// The plain-text version for email clients that don't support HTML
+const welcomeText = `
+Hi ${createdUser.name},
+
+Welcome to GEMX! We're thrilled to have you join our community.
+
+You're now ready to explore the fascinating world of gemstones with the power of AI. To get started, simply visit our prediction page and upload an image.
+
+Start Predicting: http://localhost:5173/predict  // Replace with your actual frontend URL
+
+Happy exploring!
+
+The GEMX Team
+`;
+
+
+// The beautiful HTML version
+const welcomeHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to GEMX</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse; margin: 20px auto; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <!-- Header with Gradient -->
+        <tr>
+            <td align="center" style="padding: 40px 0; background: linear-gradient(to right, #8B5CF6, #EC4899); color: #ffffff;">
+                <h1 style="margin: 0; font-size: 36px; font-weight: bold;">Welcome to GEMX</h1>
+            </td>
+        </tr>
+        <!-- Main Content -->
+        <tr>
+            <td style="padding: 40px 30px;">
+                <h2 style="font-size: 24px; margin: 0 0 20px 0; color: #333333;">Hi ${createdUser.name},</h2>
+                <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5; color: #555555;">
+                    <b>You have registered successfully!</b> We are thrilled to have you join the GEMX community.
+                </p>
+                <p style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.5; color: #555555;">
+                    Upload an image of any gemstone to get started and uncover its secrets.
+                </p>
+                <!-- Call-to-Action Button -->
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td align="center">
+                            <a href="http://localhost:5173/predict" target="_blank" style="display: inline-block; padding: 15px 30px; font-size: 18px; font-weight: bold; color: #ffffff; background-color: #8B5CF6; text-decoration: none; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                Start Predicting Now
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <!-- Footer -->
+        <tr>
+            <td align="center" style="padding: 20px 30px; background-color: #f9fafb; border-top: 1px solid #eeeeee;">
+                <p style="margin: 0; font-size: 12px; color: #999999;">
+                    You received this email because you signed up for an account on GEMX.
+                </p>
+                <p style="margin: 10px 0 0 0; font-size: 12px; color: #999999;">
+                    &copy; ${new Date().getFullYear()} GEMX. All Rights Reserved.
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+`;
+
+
+// --- How to use it ---
+try {
+    await sendEmail({
+      to: createdUser.email,
+      subject: welcomeSubject,
+      text: welcomeText,
+      html: welcomeHtml
+    });
+} catch (emailError) {
+    console.error(`Failed to send welcome email to ${createdUser.email}`, emailError);
+}
+
+
 
   // 7. Generate JWT tokens
   // const accessToken = newUser.generateAccessToken();
