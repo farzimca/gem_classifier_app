@@ -12,10 +12,14 @@ const Prediction = () => {
         <p className="text-gray-500 font-medium">Click here to add images for prediction</p>
       </div>
 
-      {/* Predict Button */}
+      <div>
+        
+        {/* Predict Button */}
       <button className="px-10 py-3 bg-yellow-300 border-2 border-black rounded-2xl font-bold text-xl hover:bg-yellow-400 transition">
         PREDICT
       </button>
+
+      </div>
 
       {/* Result Display */}
       <div className="w-64 h-64 p-2 bg-white rounded-2xl shadow-md">

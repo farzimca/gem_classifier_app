@@ -1,16 +1,13 @@
 import React from 'react';
-import Navbar from '../components/Navbar';
-import HeroSection from '../components/HeroSection';
-import Prediction from '../components/Prediction';
-import Footer from '../components/Footer';
+import HeroSection from '../components/HeroSection'; // Assuming you put it back in components
+import Prediction from '../components/Prediction';   // Assuming you put it back in components
 
 const HomePage = () => {
   return (
-    <div>
-      <Navbar />
+    // The inner container for the main content
+    <div className="bg-gray-100 border-gray-300">
       <HeroSection />
       <Prediction />
-      <Footer />
     </div>
   );
 };

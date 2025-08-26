@@ -1,26 +1,26 @@
 import React from 'react';
-import Navbar from './components/Navbar';
-import HeroSection from './components/HeroSection';
-import Prediction from './components/Prediction';
-import Footer from './components/Footer';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import HomePage from './pages/HomePage';
+import RegisterPage from './pages/RegisterPage';
+import LoginPage from './pages/LoginPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import AboutPage from './pages/AboutPage';
+import FavoriteImagesPage from './pages/FavoriteImagesPage';
 
 function App() {
   return (
-    // Sets the light grey background for the whole page
-    <div className="bg-gray-200 min-h-screen p-8">
-      {/* Main container with white background and black border */}
-      <div className="max-w-7xl mx-auto bg-white border-2 border-black rounded-2xl">
-        <Navbar />
-        {/* Inner container for the main content area */}
-        <div className="bg-gray-100 m-8 rounded-2xl border-2 border-gray-300">
-          <HeroSection />
-          <Prediction />
-        </div>
-        <div className="p-8 pt-0">
-          <Footer />
-        </div>
-      </div>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout><HomePage /></Layout>} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/about" element={<Layout><AboutPage /></Layout>} />
+        <Route path="/favorite-images" element={<Layout><FavoriteImagesPage /></Layout>} />
+
+      </Routes>
+    </Router>
   );
 }
 
