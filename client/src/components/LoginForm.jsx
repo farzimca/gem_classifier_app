@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+// 1. Import useNavigate from react-router-dom
+import { useNavigate } from "react-router-dom"; 
+import { useAuth } from "../store/auth";
 
 // --- SVG Icons ---
-// Using inline SVGs to avoid external dependencies and potential build errors.
-
 const LockIcon = ({ className }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
         <path d="M12 17a2 2 0 002-2h-4a2 2 0 002 2zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V10a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9V6z" />
@@ -27,7 +28,15 @@ const EyeSlashIcon = ({ className }) => (
     </svg>
 );
 
+const URL = '/api/v1/users/login';
+
 const LoginForm = () => {
+    // 2. Initialize the navigate function
+
+    const {storeTokenInLS} = useAuth();
+
+    const navigate = useNavigate();
+    
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -58,8 +67,7 @@ const LoginForm = () => {
         setLoading(true);
 
         try {
-            // API call to your backend login endpoint
-            const response = await fetch('http://localhost:4000/api/v1/users/login', {
+            const response = await fetch(URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -69,29 +77,36 @@ const LoginForm = () => {
                     password: formData.password
                 }),
             });
-
-            const responseText = await response.text();
+            
+            // --- CHANGE: Read the response as JSON directly ---
+            // If the response is not ok, parse the error message. Otherwise, parse the JSON body.
+            const result = await response.json(); 
 
             if (!response.ok) {
-                // Handle server-side errors
-                try {
-                    const errorJson = JSON.parse(responseText);
-                    throw new Error(errorJson.message || 'An error occurred during login.');
-                } catch (parseError) {
-                    throw new Error(responseText || 'An unknown server error occurred.');
-                }
+                // If response is not ok, the result is the error object from the backend
+                throw new Error(result.message || 'An error occurred during login.');
             }
 
-            // Handle successful login
-            const result = JSON.parse(responseText);
+            // The result is the successful login object
             setSuccess(result.message || 'Login successful!');
             console.log("Login successful:", result);
-            // Here you would typically save the token and redirect the user
-            // e.g., localStorage.setItem('token', result.data.accessToken);
-            // window.location.href = '/dashboard';
+
+            // --- CHANGE: Extract the accessToken from the result object ---
+            // The accessToken is a top-level property of the result object.
+            const accessToken = result.data.accessToken; 
+            
+            // Log the token to the console
+            console.log("Extracted Access Token:", accessToken);
+
+            // Store the token (e.g., in localStorage or a state management system)
+            storeTokenInLS(accessToken);
+
+            // 3. Redirect to the home page after a short delay
+            setTimeout(() => {
+                navigate('/'); 
+            }, 1000); // 1-second delay to show the success message
 
         } catch (err) {
-            // Handle network errors
             setError(err.message);
             console.error(err);
         } finally {
