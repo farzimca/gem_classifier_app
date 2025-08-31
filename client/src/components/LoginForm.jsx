@@ -1,64 +1,20 @@
 import React, { useState } from "react";
-// 1. Import useNavigate from react-router-dom
 import { useNavigate } from "react-router-dom"; 
 import { useAuth } from "../store/auth";
 
-// --- SVG Icons ---
-const LockIcon = ({ className }) => (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
-        <path d="M12 17a2 2 0 002-2h-4a2 2 0 002 2zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V10a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9V6z" />
-    </svg>
-);
-
-const EnvelopeIcon = ({ className }) => (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
-        <path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4.7l-8 5.33L4 8.7V6.29l8 5.33 8-5.33V8.7z" />
-    </svg>
-);
-
-const EyeIcon = ({ className }) => (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
-        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 13C9.24 17.5 7 15.26 7 12.5S9.24 7.5 12 7.5s5 2.24 5 5-2.24 5-5 5zm0-8a3 3 0 100 6 3 3 0 000-6z" />
-    </svg>
-);
-
-const EyeSlashIcon = ({ className }) => (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
-        <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.74C21.27 7.61 17 4.5 12 4.5c-1.77 0-3.39.53-4.74 1.44l2.92 2.92c.56-.23 1.17-.36 1.82-.36zm-4.6 11.14L6.26 17c-1.51-1.26-2.7-2.89-3.44-4.74C4.73 7.61 9 4.5 14 4.5c.2 0 .4.01.6.03l-1.58 1.58c-.56.23-1.17.36-1.82.36-2.76 0-5 2.24-5 5 0 .65.13 1.26.36 1.82L2.39 2.39 1.11 3.67l20.22 20.22 1.28-1.28-4.6-4.6z" />
-    </svg>
-);
-
-const URL = '/api/v1/users/login';
-
 const LoginForm = () => {
-    // 2. Initialize the navigate function
-
-    const {storeTokenInLS} = useAuth();
-
     const navigate = useNavigate();
+    // Get the new loginUser function from useAuth
+    const { loginUser } = useAuth();
     
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     });
-    const [showPassword, setShowPassword] = useState(false);
-    
-    // State for handling loading, success, and error feedback
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
-
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
+    // ... rest of your state and icon components
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -66,51 +22,16 @@ const LoginForm = () => {
         setSuccess('');
         setLoading(true);
 
-        try {
-            const response = await fetch(URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: formData.email,
-                    password: formData.password
-                }),
-            });
-            
-            // --- CHANGE: Read the response as JSON directly ---
-            // If the response is not ok, parse the error message. Otherwise, parse the JSON body.
-            const result = await response.json(); 
+        // Call the centralized loginUser function
+        const result = await loginUser(formData);
+        
+        setLoading(false);
 
-            if (!response.ok) {
-                // If response is not ok, the result is the error object from the backend
-                throw new Error(result.message || 'An error occurred during login.');
-            }
-
-            // The result is the successful login object
-            setSuccess(result.message || 'Login successful!');
-            console.log("Login successful:", result);
-
-            // --- CHANGE: Extract the accessToken from the result object ---
-            // The accessToken is a top-level property of the result object.
-            const accessToken = result.data.accessToken; 
-            
-            // Log the token to the console
-            console.log("Extracted Access Token:", accessToken);
-
-            // Store the token (e.g., in localStorage or a state management system)
-            storeTokenInLS(accessToken);
-
-            // 3. Redirect to the home page after a short delay
-            setTimeout(() => {
-                navigate('/'); 
-            }, 1000); // 1-second delay to show the success message
-
-        } catch (err) {
-            setError(err.message);
-            console.error(err);
-        } finally {
-            setLoading(false);
+        if (result.success) {
+            setSuccess(result.message);
+            navigate('/user/predict');
+        } else {
+            setError(result.message);
         }
     };
 
@@ -156,6 +77,13 @@ const LoginForm = () => {
                     >
                         {showPassword ? <EyeSlashIcon className="text-gray-600" /> : <EyeIcon className="text-gray-600" />}
                     </span>
+                </div>
+                
+                {/* Forgot Password Link - Added here */}
+                <div className="text-right -mt-2">
+                    <a href="/reset-password" className="text-sm font-medium text-purple-600 hover:underline">
+                        Forgot your password?
+                    </a>
                 </div>
 
                 {/* Display Error/Success Messages */}

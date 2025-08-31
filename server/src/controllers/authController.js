@@ -371,7 +371,7 @@ export const UpdateUser = asyncHandler(async (req, res) => {
       req.myUser._id,
       {
         $set: {
-          fullname,
+          name: fullname,
           email,
         },
       },
