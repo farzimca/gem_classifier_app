@@ -1,4 +1,5 @@
 import multer from "multer";
+import { ApiError } from "../utils/ApiErrors.js";
 
 const storage = multer.diskStorage({
   
@@ -12,6 +13,17 @@ filename: function (req, file, cb) {
     cb(null, file.originalname)
   }
 
-})
+});
 
-export const upload = multer({ storage: storage })
+const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+
+// File filter for validation
+const fileFilter = (req, file, cb) => {
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new ApiError(400, "Only image files are allowed!"), false);
+  }
+};
+
+export const upload = multer({ storage: storage, fileFilter })
