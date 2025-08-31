@@ -289,19 +289,27 @@ export const RefreshAccessToken = asyncHandler(async (req, res) => {
 export const PasswordChange = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
+    if (!oldPassword || !newPassword) {
+    throw new ApiError(400, "Both old and new passwords are required");
+  }
+
   if (oldPassword === newPassword) {
     throw new ApiError(400, "Old password and new password can't be the same");
   }
 
   const myUser = await User.findById(req.myUser._id);
   const isPasswordCorrect = await myUser.isPasswordCorrect(oldPassword);
-
   if (!isPasswordCorrect) {
     throw new ApiError(400, "Invalid Password");
   }
 
+
+  if (!newPassword.trim() || newPassword.trim().length < 6) {
+    throw new ApiError(400, "Password must be at least 6 characters long");
+  }
+
   myUser.password = newPassword;
-  await myUser.save({ validateBeforeSave: false });
+  await myUser.save();
 
   return res
     .status(200)
@@ -359,30 +367,62 @@ export const AvatarUpdate = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, myUser, `Avatar Updated Successfully`));
 });
 
+
 export const UpdateUser = asyncHandler(async (req, res) => {
   const { fullname, email } = req.body;
 
-  if (!fullname && !email) {
-    throw new ApiError(400, "At least one field (fullname or email) is required to update.");
+  const updateData = {}; // This will hold the valid fields to update
+
+  // 1. Validate and add fullname if it's a non-empty string
+  if (fullname && fullname.trim() !== "") {
+    // We use trim() to remove leading/trailing whitespace and then check for emptiness
+    updateData.name = fullname.trim();
   }
 
-  const myUser = await User
-    .findByIdAndUpdate(
-      req.myUser._id,
-      {
-        $set: {
-          name: fullname,
-          email,
-        },
-      },
+  // 2. Validate and add email if it's a non-empty string
+  if (email && email.trim() !== "") {
+    const trimmedEmail = email.trim();
 
-      { new: true } // this will return after updated ===> new data that is updated using this query
-    )
-    .select("-password"); // will return user without password
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      throw new ApiError(400, "Invalid email format.");
+    }
 
+    // Check if the trimmed email is already in use by another user
+    const existingUser = await User.findOne({
+      email: trimmedEmail,
+      _id: { $ne: req.myUser._id },
+    });
+    if (existingUser) {
+      throw new ApiError(409, "This email is already taken by another account.");
+    }
+
+    updateData.email = trimmedEmail;
+  }
+
+  // 3. Check if there's actually anything valid to update
+  if (Object.keys(updateData).length === 0) {
+    throw new ApiError(400, "No valid fields provided for update. Empty or whitespace-only values are not allowed.");
+  }
+
+  // 4. Perform the update with the validated and cleaned data
+  const updatedUser = await User.findByIdAndUpdate(
+    req.myUser._id,
+    {
+      $set: updateData, // Only valid, non-empty fields will be in here
+    },
+    { new: true }
+  ).select("-password");
+
+  if (!updatedUser) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  // 5. Send the successful response
   return res
     .status(200)
-    .json(new ApiResponse(200, myUser, "User Updated Successfully"));
+    .json(new ApiResponse(200, updatedUser, "User details updated successfully."));
 });
 
 
@@ -499,7 +539,6 @@ const html = `
   return res.status(200).json(new ApiResponse(200, {}, "A reset link has been sent"));
 
 });
-
 
 
 export const resetPassword = asyncHandler(async (req, res) => {
