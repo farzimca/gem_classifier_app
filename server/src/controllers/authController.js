@@ -384,3 +384,167 @@ export const UpdateUser = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, myUser, "User Updated Successfully"));
 });
+
+
+
+export const requestPasswordReset = asyncHandler(async (req, res) =>{
+
+ const { email } = req.body; 
+
+  if (!email) {
+    throw new ApiError(400, "Email is required.");
+  }
+  
+  const user = await User.findOne({ email })
+  
+  if(!user)
+  {
+    throw new ApiError(400, "If that email is registered, a reset link has been sent");
+  }
+
+
+   // Create a reset token (expires in 15 minutes)
+  const resetToken = jwt.sign(
+    { _id: user._id, purpose: "resetPassword" },
+    process.env.RESET_PASSWORD_SECRET,
+    { expiresIn: "15m" }
+  );
+
+
+    const resetURL = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`; // change with frontend Link Later
+
+
+     // Email content
+  const subject = "Your GEMX Password Reset Request";
+
+// The plain-text version for email clients that don't support HTML
+const text = `
+Hi ${user.name},
+
+We received a request to reset the password for your GEMX account.
+
+Please click the link below to set a new password. This link is only valid for the next 15 minutes.
+
+Reset your password: ${resetURL}
+
+If you did not request a password reset, you can safely ignore this email. Your password will not be changed.
+
+Thank you,
+The GEMX Team
+`;
+
+// The beautiful, themed HTML version
+const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Reset Request</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse; margin: 20px auto; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <!-- Header with GEMX Gradient -->
+        <tr>
+            <td align="center" style="padding: 40px 0; background: linear-gradient(to right, #8B5CF6, #EC4899); color: #ffffff;">
+                <h1 style="margin: 0; font-size: 36px; font-weight: bold;">GEMX</h1>
+                <p style="margin: 10px 0 0 0; font-size: 16px;">Password Reset</p>
+            </td>
+        </tr>
+        <!-- Main Content -->
+        <tr>
+            <td style="padding: 40px 30px;">
+                <h2 style="font-size: 24px; margin: 0 0 20px 0; color: #333333;">Hi ${user.name},</h2>
+                <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5; color: #555555;">
+                    We received a request to reset the password associated with your account.
+                </p>
+                <p style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.5; color: #555555;">
+                    Please click the button below to set a new password. For your security, this link will expire in <strong>15 minutes</strong>.
+                </p>
+                <!-- Call-to-Action Button -->
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td align="center">
+                            <a href="${resetURL}" target="_blank" style="display: inline-block; padding: 15px 30px; font-size: 18px; font-weight: bold; color: #ffffff; background-color: #8B5CF6; text-decoration: none; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                Reset Your Password
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                <p style="margin: 30px 0 0 0; font-size: 14px; line-height: 1.5; color: #777777; text-align: center;">
+                    If you did not request a password reset, please disregard this email. Your account is secure.
+                </p>
+            </td>
+        </tr>
+        <!-- Footer -->
+        <tr>
+            <td align="center" style="padding: 20px 30px; background-color: #f9fafb; border-top: 1px solid #eeeeee;">
+                <p style="margin: 0; font-size: 12px; color: #999999;">
+                    &copy; ${new Date().getFullYear()} GEMX. All Rights Reserved.
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+`;
+
+
+  try {
+    await sendEmail({ to: email, subject, text, html });
+  } catch (err) {
+    console.error("Error sending reset password email:", err);
+  }
+
+  return res.status(200).json(new ApiResponse(200, {}, "A reset link has been sent"));
+
+});
+
+
+
+export const resetPassword = asyncHandler(async (req, res) => {
+
+
+//  const token = req.params;;
+
+
+  const { token, newPassword, confirmPassword } = req.body;
+
+
+
+  if (!token || !newPassword || !confirmPassword) {
+    throw new ApiError(400, "Token and passwords are required");
+  }
+
+  if (newPassword !== confirmPassword) {
+    throw new ApiError(400, "Passwords do not match");
+  }
+
+  // Verify reset token
+  let payload;
+  try {
+    payload = jwt.verify(token, process.env.RESET_PASSWORD_SECRET);
+  } catch (err) {
+    throw new ApiError(400, "Invalid or expired reset token");
+  }
+
+  if (payload.purpose !== "resetPassword") {
+    throw new ApiError(400, "Invalid reset token");
+  }
+
+  // Find user
+  const user = await User.findById(payload._id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+
+  user.password = newPassword;
+
+  // Save updated user
+  await user.save();
+
+  // Optionally, invalidate all existing refresh tokens or sessions here
+
+  return res.status(200).json(new ApiResponse(200, {}, "Password reset successfully"));
+});
