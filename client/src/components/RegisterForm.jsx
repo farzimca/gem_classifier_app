@@ -154,7 +154,7 @@ const RegisterForm = () => {
 
             // Redirect to the home page after a short delay
             setTimeout(() => {
-                navigate('/'); 
+                navigate('/login'); 
             }, 1000); // 1-second delay to show the success message
 
         } catch (err) {

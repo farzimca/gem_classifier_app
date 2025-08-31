@@ -62,7 +62,14 @@ const Navbar = () => {
 
           {isLoggedIn ? (
             <>
-              <NavLink to="/profile" className={activeLinkClass}>
+              <NavLink
+                to="/profile"
+                onClick={toggleMenu}
+                className={({ isActive }) =>
+                  `p-2 rounded-full transition-colors duration-200 
+    ${isActive ? 'bg-purple-100 ring-2 ring-purple-500' : 'hover:bg-gray-100'}`
+                }
+              >
                 <UserIcon />
               </NavLink>
               <NavLink
@@ -98,7 +105,7 @@ const Navbar = () => {
             {isLoggedIn ? (
               <>
                 <NavLink to="/profile" onClick={toggleMenu} className={activeMobileLinkClass}>
-                  <UserIcon />
+                  PROFILE
                 </NavLink>
                 <NavLink
                   to="/logout"
