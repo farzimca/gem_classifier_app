@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-
+import gemImage from '../assets/sapphire-result.png'
 // --- SVG Icons ---
 const UploadIcon = () => (
   <svg className="w-16 h-16 text-purple-400 group-hover:text-purple-500 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -211,8 +211,8 @@ const Prediction = () => {
                 </div>
               </div>
             ) : (
-              <div className="text-center text-gray-400">
-                <p>Prediction results will appear here</p>
+              <div className="text-center text-gray-400 p-4">
+                <p className='text-lg'>Prediction results will appear here</p>
               </div>
             )}
           </div>

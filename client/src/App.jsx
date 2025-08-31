@@ -7,6 +7,8 @@ import LoginPage from './pages/LoginPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import AboutPage from './pages/AboutPage';
 import FavoriteImagesPage from './pages/FavoriteImagesPage';
+import TestBackend from './pages/TestBackend';
+import Prediction from './components/Prediction';
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/about" element={<Layout><AboutPage /></Layout>} />
         <Route path="/favorite-images" element={<Layout><FavoriteImagesPage /></Layout>} />
+        <Route path="/test" element={<Layout><TestBackend /></Layout>} />
+        <Route path="/predict" element={<Prediction/>} />
 
       </Routes>
     </Router>
