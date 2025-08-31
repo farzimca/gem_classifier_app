@@ -1,5 +1,5 @@
 import express from "express";
-import { register, login, logout, RefreshAccessToken, PasswordChange, AvatarUpdate, getCurrentUser, UpdateUser} from "../controllers/authController.js";
+import { register, login, logout, RefreshAccessToken, PasswordChange, AvatarUpdate, getCurrentUser, UpdateUser, requestPasswordReset, resetPassword} from "../controllers/authController.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { VerifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -16,5 +16,8 @@ router.post('/change-avatar', VerifyJWT, upload.single('avatar'), AvatarUpdate)
 router.get("/current-user", VerifyJWT, getCurrentUser);
 router.post("/current-userinfo", VerifyJWT, UpdateUser);
 
+
+router.post("/forgot-password",requestPasswordReset); // this generates a link 
+router.post("/reset-password", resetPassword);
 
 export default router;
