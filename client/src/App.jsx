@@ -11,6 +11,8 @@ import NotFoundPage from './pages/NotFoundPage';
 import { LogoutPage } from './pages/LogoutPage';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
+import PredictPageRouter from './components/PredictPageRouter';
+import Prediction from '../../server/src/models/Prediction.model';
 
 function App() {
   return (
@@ -24,6 +26,9 @@ function App() {
         <Route path="/about" element={<Layout><AboutPage /></Layout>} />
         <Route path="/profile" element={<Layout><Profile /></Layout>} />
         <Route path="/edit-profile" element={<Layout><EditProfile /></Layout>} />
+        <Route path="/predict" element={<Layout><PredictPageRouter /></Layout>} />
+        <Route path="/user/predict" element={<Layout><Prediction /></Layout>} />
+        <Route path="/guest/predict" element={<Layout><Prediction /></Layout>} />
         <Route path="/favorite-images" element={<Layout><FavoriteImagesPage /></Layout>} />
         <Route path="*" element={<Layout><NotFoundPage /></Layout>} />
 
