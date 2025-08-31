@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+// --- 1. Import useNavigate from react-router-dom ---
+import { useNavigate } from "react-router-dom"; 
 
 // --- SVG Icons ---
 // Using inline SVGs to avoid external dependencies and potential build errors.
@@ -39,8 +41,12 @@ const IdCardIcon = ({ className }) => (
     </svg>
 );
 
+const URL = '/api/v1/users/register';
 
 const RegisterForm = () => {
+    // --- 2. Initialize the navigate function ---
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
         name: '', // Changed from 'fullname' to match backend
         username: '',
@@ -110,7 +116,7 @@ const RegisterForm = () => {
 
         try {
             // API call to your backend endpoint
-            const response = await fetch('http://localhost:4000/api/v1/users/register', {
+            const response = await fetch(URL, {
                 method: 'POST',
                 body: data,
             });
@@ -146,6 +152,11 @@ const RegisterForm = () => {
                 avatar: null,
             });
 
+            // Redirect to the home page after a short delay
+            setTimeout(() => {
+                navigate('/'); 
+            }, 1000); // 1-second delay to show the success message
+
         } catch (err) {
             // Handle network errors (like CORS or server being down)
             setError(err.message);
@@ -164,8 +175,8 @@ const RegisterForm = () => {
                 {/* Full Name Input */}
                 <div className="relative">
                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                        <IdCardIcon className="text-gray-400" />
-                    </span>
+                         <IdCardIcon className="text-gray-400" />
+                     </span>
                     <input
                         type="text"
                         name="name" // Matches the backend field

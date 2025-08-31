@@ -160,7 +160,8 @@ const AboutPage = () => {
           <motion.img
             src="https://admin.jammuuniversity.ac.in/JUProfiles/assets/images/id-152-Pic.jpg"
             alt="Prof. Vinod Sharma"
-            className="w-40 h-40 mx-auto rounded-full shadow-lg mb-6 object-cover mask-r-from-97% mask-l-from-97%"
+            className="w-40 h-40 mx-auto rounded-full shadow-lg mb-6 object-cover mask-r-from-97% mask-l-from-97% "
+            draggable={false}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.7 }}
@@ -188,14 +189,16 @@ const AboutPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
           <DeveloperCard
             name="Himanshu Parihar"
-            image="https://placehold.co/400x400/e2e8f0/334155?text=Himanshu+Parihar"
-            github="#"
+            image="https://media.licdn.com/dms/image/v2/D4D03AQG7gC8OJStToQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1689518512932?e=1759363200&v=beta&t=1x-cmCSN1oWp25FarSCMUgxtxdtbBpf7DR3EruA0xt8"
+            draggable={false}
+            github="https://www.github.com/pariharx7"
             linkedin="#"
           />
           <DeveloperCard
             name="Agrim Sharma"
-            image="https://pbs.twimg.com/profile_images/1659973399714713600/8z4NWowv_400x400.jpg"
-            github="#"
+            image="https://avatars.githubusercontent.com/u/182859960?v=4"
+            draggable={false}
+            github="https://www.github.com/codeagrim"
             linkedin="#"
           />
         </div>
