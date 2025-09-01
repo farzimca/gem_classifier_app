@@ -9,9 +9,10 @@ import axios from "axios";
 import FormData from "form-data";
 
 // The URL for your new, high-performance FastAPI ML service
+const ML_API_URL = "https://mcaxmca-gem-1.hf.space/predict";
 // const ML_API_URL = "https://gemmlapi-production.up.railway.app/predict";
 // const ML_API_URL = "https://localhost:8080/predict";
-const ML_API_URL = "http://localhost:8000/predict";
+
 
 /**
  * A helper function to delegate the prediction task to the FastAPI ML service.
@@ -23,7 +24,7 @@ const getPredictionFromMLService = async (imagePath, mimetype) => {
   try {
     const formData = new FormData();
     // The field name "image" must match what the FastAPI endpoint expects.
-    formData.append("image", fs.createReadStream(imagePath), {
+    formData.append("file", fs.createReadStream(imagePath), {
       contentType: mimetype,
       filename: "gemstone.jpg", // A placeholder filename is needed
     });
