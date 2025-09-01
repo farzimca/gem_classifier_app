@@ -9,13 +9,10 @@ import axios from "axios";
 import FormData from "form-data";
 
 // The URL for your new, high-performance FastAPI ML service
-<<<<<<< HEAD
 const ML_API_URL = "https://mcaxmca-gem-1.hf.space/predict";
-=======
 // const ML_API_URL = "https://gemmlapi-production.up.railway.app/predict";
 // const ML_API_URL = "https://localhost:8080/predict";
-const ML_API_URL = "http://localhost:8000/predict";
->>>>>>> faf9099971ae04f5d6639d87b9b1a22418dc29c0
+
 
 /**
  * A helper function to delegate the prediction task to the FastAPI ML service.
