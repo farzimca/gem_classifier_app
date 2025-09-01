@@ -9,6 +9,8 @@ import axios from "axios";
 import FormData from "form-data";
 
 // The URL for your new, high-performance FastAPI ML service
+// const ML_API_URL = "https://gemmlapi-production.up.railway.app/predict";
+// const ML_API_URL = "https://localhost:8080/predict";
 const ML_API_URL = "http://localhost:8000/predict";
 
 /**
