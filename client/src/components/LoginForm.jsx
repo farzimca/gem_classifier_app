@@ -2,9 +2,35 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import { useAuth } from "../store/auth";
 
+// --- SVG Icon Components ---
+const EnvelopeIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+    </svg>
+);
+
+const LockIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6a4.5 4.5 0 10-9 0v4.5m10.5 0h-10.5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" />
+    </svg>
+);
+
+const EyeIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.575 3.01 9.963 7.823a1.012 1.012 0 010 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.575-3.01-9.963-7.823z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+);
+
+const EyeSlashIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.41a1.012 1.012 0 01.922-.387h12.15a1.012 1.012 0 01.922.387M21 12c-1.397 3.552-4.279 6.232-7.531 8.225-.262.163-.532.29-.8.401M3 12c1.397-3.552 4.279-6.232 7.531-8.225.262-.163.532-.29.8-.401M12 21a9 9 0 00.401-1.075" />
+    </svg>
+);
+
 const LoginForm = () => {
     const navigate = useNavigate();
-    // Get the new loginUser function from useAuth
     const { loginUser } = useAuth();
     
     const [formData, setFormData] = useState({
@@ -14,7 +40,16 @@ const LoginForm = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    // ... rest of your state and icon components
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,13 +57,13 @@ const LoginForm = () => {
         setSuccess('');
         setLoading(true);
 
-        // Call the centralized loginUser function
         const result = await loginUser(formData);
         
         setLoading(false);
 
         if (result.success) {
             setSuccess(result.message);
+            // Navigate to the prediction page
             navigate('/user/predict');
         } else {
             setError(result.message);
@@ -79,9 +114,9 @@ const LoginForm = () => {
                     </span>
                 </div>
                 
-                {/* Forgot Password Link - Added here */}
+                {/* Forgot Password Link */}
                 <div className="text-right -mt-2">
-                    <a href="/reset-password" className="text-sm font-medium text-purple-600 hover:underline">
+                    <a href="/forgot-password" className="text-sm font-medium text-purple-600 hover:underline">
                         Forgot your password?
                     </a>
                 </div>
