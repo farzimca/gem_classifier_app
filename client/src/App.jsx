@@ -4,15 +4,14 @@ import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
 import AboutPage from './pages/AboutPage';
 import FavoriteImagesPage from './pages/FavoriteImagesPage';
 import NotFoundPage from './pages/NotFoundPage';
 import { LogoutPage } from './pages/LogoutPage';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
-import PredictPageRouter from './components/PredictPageRouter';
-import Prediction from '../../server/src/models/Prediction.model';
+import ResetPassword from './pages/ResetPassword';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 function App() {
   return (
@@ -22,13 +21,11 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/logout" element={<LogoutPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/about" element={<Layout><AboutPage /></Layout>} />
         <Route path="/profile" element={<Layout><Profile /></Layout>} />
         <Route path="/edit-profile" element={<Layout><EditProfile /></Layout>} />
-        <Route path="/predict" element={<Layout><PredictPageRouter /></Layout>} />
-        <Route path="/user/predict" element={<Layout><Prediction /></Layout>} />
-        <Route path="/guest/predict" element={<Layout><Prediction /></Layout>} />
         <Route path="/favorite-images" element={<Layout><FavoriteImagesPage /></Layout>} />
         <Route path="*" element={<Layout><NotFoundPage /></Layout>} />
 

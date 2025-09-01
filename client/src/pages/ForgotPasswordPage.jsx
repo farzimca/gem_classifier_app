@@ -1,17 +1,17 @@
 import React from 'react';
 import Footer from '../components/Footer';
-import ResetPasswordForm from '../components/ResetPasswordForm';
+import ForgotPasswordForm from '../components/ForgotPasswordForm';
 
-const ResetPasswordPage = () => {
+const ForgotPasswordPage = () => {
     return (
         <>
-            <header className="text-3xl font-bold text-center p-4">GEMX</header>
+        <header className="text-3xl font-bold text-center p-4">GEMX</header>
         <div className="bg-gray-200 min-h-screen p-8 flex flex-col items-center justify-center">
-            <ResetPasswordForm />
+            <ForgotPasswordForm />
         </div>
             <Footer />
         </>
     );
 }
 
-export default ResetPasswordPage;
+export default ForgotPasswordPage;
