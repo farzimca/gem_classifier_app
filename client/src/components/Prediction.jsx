@@ -166,9 +166,9 @@ const Prediction = () => {
                 name: result.data.gemstoneName,
             });
 
-        } catch (err) {
-            setError(err.message);
-            console.error("Prediction API error:", err);
+        } catch (error) {
+            setError(error.message);
+            console.error("Prediction API error:", error);
         } finally {
             setIsLoading(false);
         }
@@ -293,6 +293,11 @@ const Prediction = () => {
                                 )}
                                 <div className="mt-2">
                                     <p className="text-2xl font-bold text-gray-800">{predictionResult.name}</p>
+                                    {isLoggedIn ? (
+                                        <p className="text-sm text-purple-600 font-semibold">Saved to your upload history!</p>
+                                    ) : (
+                                        <p className="text-sm text-gray-500">Log in to save your history and favorite gems.</p>
+                                    )}
                                 </div>
                             </div>
                         ) : (
