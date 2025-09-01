@@ -4,7 +4,6 @@ import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
-import ForgotPasswordPage from './pages/ForogtPasswordPage';
 import AboutPage from './pages/AboutPage';
 import FavoriteImagesPage from './pages/FavoriteImagesPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -12,6 +11,7 @@ import { LogoutPage } from './pages/LogoutPage';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import ResetPassword from './pages/ResetPassword';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 function App() {
   return (

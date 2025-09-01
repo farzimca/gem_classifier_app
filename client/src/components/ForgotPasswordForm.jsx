@@ -10,7 +10,7 @@ const EnvelopeIcon = ({ className }) => (
   </svg>
 );
 
-const ResetPasswordForm = () => {
+const ForgotPasswordForm = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: '',
@@ -89,7 +89,7 @@ const ResetPasswordForm = () => {
                 {/* Reset Button */}
                 <button
                     type="submit"
-                    className="w-full py-3 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full py-3 bg-purple-600 text-white cursor-pointer font-semibold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                     SEND RESET LINK
                 </button>
@@ -105,4 +105,4 @@ const ResetPasswordForm = () => {
     );
 };
 
-export default ResetPasswordForm;
+export default ForgotPasswordForm;

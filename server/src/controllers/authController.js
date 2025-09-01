@@ -399,7 +399,7 @@ export const requestPasswordReset = asyncHandler(async (req, res) =>{
   
   if(!user)
   {
-    throw new ApiError(400, "If that email is registered, a reset link has been sent");
+    throw new ApiError(400, `It looks like ${email} isn't connected to an account. You can create a new account with this email or try again`);
   }
 
 

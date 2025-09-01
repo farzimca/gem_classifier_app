@@ -116,7 +116,7 @@ const LoginForm = () => {
                 
                 {/* Forgot Password Link */}
                 <div className="text-right -mt-2">
-                    <a href="/reset-password" className="text-sm font-medium text-purple-600 hover:underline">
+                    <a href="/forgot-password" className="text-sm font-medium text-purple-600 hover:underline">
                         Forgot your password?
                     </a>
                 </div>
