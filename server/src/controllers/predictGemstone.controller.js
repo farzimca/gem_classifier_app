@@ -20,13 +20,39 @@ const ML_API_URL = "https://mcaxmca-gem-1.hf.space/predict";
  * @param {string} mimetype - The mimetype of the image (e.g., 'image/jpeg').
  * @returns {Promise<string>} The predicted gemstone name.
  */
-const getPredictionFromMLService = async (imagePath, mimetype) => {
+// const getPredictionFromMLService = async (imagePath, mimetype) => {
+//   try {
+//     const formData = new FormData();
+//     // The field name "image" must match what the FastAPI endpoint expects.
+//     formData.append("file", fs.createReadStream(imagePath), {
+//       contentType: mimetype,
+//       filename: "gemstone.jpg", // A placeholder filename is needed
+//     });
+
+//     const response = await axios.post(ML_API_URL, formData, {
+//       headers: formData.getHeaders(),
+//     });
+
+//     if (!response.data || !response.data.gemstoneName) {
+//         throw new Error("Invalid response from prediction service.");
+//     }
+
+//     return response.data.gemstoneName;
+//   } catch (error) {
+//     console.error("❌ Error calling ML service:", error.response?.data || error.message);
+//     throw new ApiError(502, "The prediction service is currently unavailable or failed."); // 502 Bad Gateway is appropriate here
+//   }
+// };
+
+
+// --- REFACTORED Controller for GUEST Users ---
+
+const getPredictionFromMLService = async (fileBuffer, mimetype) => {
   try {
     const formData = new FormData();
-    // The field name "image" must match what the FastAPI endpoint expects.
-    formData.append("file", fs.createReadStream(imagePath), {
+    formData.append("file", fileBuffer, {
       contentType: mimetype,
-      filename: "gemstone.jpg", // A placeholder filename is needed
+      filename: "gemstone.jpg",
     });
 
     const response = await axios.post(ML_API_URL, formData, {
@@ -34,18 +60,16 @@ const getPredictionFromMLService = async (imagePath, mimetype) => {
     });
 
     if (!response.data || !response.data.gemstoneName) {
-        throw new Error("Invalid response from prediction service.");
+      throw new Error("Invalid response from prediction service.");
     }
 
     return response.data.gemstoneName;
   } catch (error) {
     console.error("❌ Error calling ML service:", error.response?.data || error.message);
-    throw new ApiError(502, "The prediction service is currently unavailable or failed."); // 502 Bad Gateway is appropriate here
+    throw new ApiError(502, "The prediction service is currently unavailable or failed.");
   }
 };
 
-
-// --- REFACTORED Controller for GUEST Users ---
 export const predictAsGuest = asyncHandler(async (req, res) => {
   const localImagePath = req.file?.path;
   if (!localImagePath) {
@@ -54,7 +78,8 @@ export const predictAsGuest = asyncHandler(async (req, res) => {
 
   try {
     // 1. Get prediction instantly from our fast ML microservice
-    const predictedClass = await getPredictionFromMLService(localImagePath, req.file.mimetype);
+    // const predictedClass = await getPredictionFromMLService(localImagePath, req.file.mimetype);
+const predictedClass = await getPredictionFromMLService(req.file.buffer, req.file.mimetype);
 
     // 2. Convert original image to Base64 to send back to the user
     const imageBuffer = fs.readFileSync(localImagePath);
@@ -82,7 +107,8 @@ export const predictAsUser = asyncHandler(async (req, res) => {
 
   try {
     // 1. Get prediction instantly from our fast ML microservice
-    const predictedClass = await getPredictionFromMLService(localImagePath, req.file.mimetype);
+    // const predictedClass = await getPredictionFromMLService(localImagePath, req.file.mimetype);
+const predictedClass = await getPredictionFromMLService(req.file.buffer, req.file.mimetype);
 
     // 2. Upload the original image to Cloudinary for permanent storage
     const uploadedImage = await uploadOnCloudinary(localImagePath);
