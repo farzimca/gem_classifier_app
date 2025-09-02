@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-// --- 1. Import useNavigate from react-router-dom ---
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
+// 1. Import the toast function from Sonner
+import { toast } from 'sonner';
 
 // --- SVG Icons ---
-// Using inline SVGs to avoid external dependencies and potential build errors.
-
 const LockIcon = ({ className }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
         <path d="M12 17a2 2 0 002-2h-4a2 2 0 002 2zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V10a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9V6z" />
@@ -44,11 +43,10 @@ const IdCardIcon = ({ className }) => (
 const URL = '/api/v1/users/register';
 
 const RegisterForm = () => {
-    // --- 2. Initialize the navigate function ---
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
-        name: '', // Changed from 'fullname' to match backend
+        name: '',
         username: '',
         email: '',
         password: '',
@@ -61,10 +59,8 @@ const RegisterForm = () => {
         confirmPassword: false,
     });
     
-    // State for handling loading, success, and error feedback
+    // State for loading feedback only
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -80,7 +76,7 @@ const RegisterForm = () => {
             ...prevData,
             avatar: file,
         }));
-    }
+    };
 
     const togglePasswordVisibility = (field) => {
         setShowPassword((prev) => ({
@@ -91,22 +87,19 @@ const RegisterForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setSuccess('');
 
-        // Frontend validation for password confirmation
+        // Frontend validation
         if (formData.password !== formData.confirmPassword) {
-            setError("Passwords do not match!");
+            toast.error("Passwords do not match!");
             return;
         }
         if (!formData.avatar) {
-            setError("Please upload an avatar image.");
+            toast.error("Please upload an avatar image.");
             return;
         }
 
         setLoading(true);
 
-        // Use FormData to send both text fields and the file
         const data = new FormData();
         data.append('name', formData.name);
         data.append('username', formData.username);
@@ -115,7 +108,6 @@ const RegisterForm = () => {
         data.append('avatar', formData.avatar);
 
         try {
-            // API call to your backend endpoint
             const response = await fetch(URL, {
                 method: 'POST',
                 body: data,
@@ -124,25 +116,21 @@ const RegisterForm = () => {
             const responseText = await response.text();
 
             if (!response.ok) {
-                // Handle server-side errors
                 try {
                     const errorJson = JSON.parse(responseText);
+                    toast.error(errorJson.message || 'An error occurred during registration.');
                     throw new Error(errorJson.message || 'An error occurred during registration.');
                 } catch (parseError) {
+                    toast.error(responseText || 'An unknown server error occurred.');
                     throw new Error(responseText || 'An unknown server error occurred.');
                 }
             }
             
-            // Handle successful registration
-            if (responseText) {
-                const result = JSON.parse(responseText);
-                setSuccess(result.message || 'Registration successful! Please log in.');
-                console.log(result);
-            } else {
-                setSuccess('Registration successful! Please log in.');
-            }
-
-            // Clear the form after successful submission
+            const result = responseText ? JSON.parse(responseText) : {};
+            const successMessage = result.message || 'Registration successful! Please log in.';
+            
+            toast.success(successMessage);
+            
             setFormData({
                 name: '',
                 username: '',
@@ -152,14 +140,10 @@ const RegisterForm = () => {
                 avatar: null,
             });
 
-            // Redirect to the home page after a short delay
-            setTimeout(() => {
-                navigate('/login'); 
-            }, 1000); // 1-second delay to show the success message
+            navigate('/login'); 
 
         } catch (err) {
-            // Handle network errors (like CORS or server being down)
-            setError(err.message);
+            toast.error(err.message);
             console.error(err);
         } finally {
             setLoading(false);
@@ -174,12 +158,12 @@ const RegisterForm = () => {
             <form onSubmit={handleSubmit} className="mt-8 space-y-4">
                 {/* Full Name Input */}
                 <div className="relative">
-                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                         <IdCardIcon className="text-gray-400" />
-                     </span>
+                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                      <IdCardIcon className="text-gray-400" />
+                   </span>
                     <input
                         type="text"
-                        name="name" // Matches the backend field
+                        name="name"
                         value={formData.name}
                         onChange={handleChange}
                         placeholder="Full Name"
@@ -276,14 +260,10 @@ const RegisterForm = () => {
                     </span>
                 </div>
                 
-                {/* Display Error/Success Messages */}
-                {error && <p className="text-center text-sm text-red-600">{error}</p>}
-                {success && <p className="text-center text-sm text-green-600">{success}</p>}
-
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-purple-300"
+                    className="w-full py-3 bg-purple-600 cursor-pointer text-white font-semibold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-purple-300"
                 >
                     {loading ? 'Registering...' : 'Register'}
                 </button>

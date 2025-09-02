@@ -108,7 +108,7 @@ export const predictAsUser = asyncHandler(async (req, res) => {
       new ApiResponse(201, {
           gemstoneName: predictedClass,
           imageUrl: uploadedImage.url,
-          predictionId: prediction._id,
+          _id: prediction._id,
         }, "Prediction successful and saved")
     );
   } finally {
@@ -117,4 +117,35 @@ export const predictAsUser = asyncHandler(async (req, res) => {
       fs.unlinkSync(localImagePath);
     }
   }
+});
+
+export const getMultiplePredictions = asyncHandler(async (req, res) => {
+    // 1. Get the array of IDs from the request body
+    const { ids } = req.body;
+
+    // 2. Validate the input
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        throw new ApiError(400, "An array of prediction IDs is required.");
+    }
+
+    // 3. Find predictions that match the provided IDs
+    // The .find() method with $in operator is perfect for this.
+    const predictions = await Prediction.find({
+        _id: {
+            $in: ids
+        },
+        user: req.myUser._id // Security check: Ensure the predictions belong to the current user
+    }).select("-__v -updatedAt"); // Exclude unnecessary fields
+
+    // 4. Send the found predictions in a successful response
+    // Even if some IDs are not found, we send a 200 OK with the ones we did find.
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                predictions,
+                "Predictions fetched successfully."
+            )
+        );
 });

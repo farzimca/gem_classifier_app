@@ -29,6 +29,9 @@ const Footer = () => {
             <p className="text-gray-400">
               Identifying Earth's rarest treasures with the power of AI.
             </p>
+            <p className="text-gray-400">
+              Made with ❤️ ☮︎
+            </p>
           </div>
 
           {/* Quick Links */}
@@ -37,7 +40,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <li><a href="/" className="text-gray-400 hover:text-purple-400 transition-colors">Home</a></li>
               <li><a href="/about" className="text-gray-400 hover:text-purple-400 transition-colors">About</a></li>
-              <li><a href="/predict" className="text-gray-400 hover:text-purple-400 transition-colors">Predict</a></li>
+              <li><a href="/register" className="text-gray-400 hover:text-purple-400 transition-colors">Register</a></li>
             </ul>
           </div>
 

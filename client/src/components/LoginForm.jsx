@@ -1,45 +1,42 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../store/auth";
+import { toast } from 'sonner'; // Import the toast function
 
 // --- SVG Icon Components ---
-const EnvelopeIcon = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" {...props}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+const LockIcon = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
+        <path d="M12 17a2 2 0 002-2h-4a2 2 0 002 2zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V10a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9V6z" />
     </svg>
 );
 
-const LockIcon = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" {...props}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6a4.5 4.5 0 10-9 0v4.5m10.5 0h-10.5" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" />
+const EnvelopeIcon = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
+        <path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4.7l-8 5.33L4 8.7V6.29l8 5.33 8-5.33V8.7z" />
     </svg>
 );
 
-const EyeIcon = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" {...props}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.575 3.01 9.963 7.823a1.012 1.012 0 010 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.575-3.01-9.963-7.823z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+const EyeIcon = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
+        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 13C9.24 17.5 7 15.26 7 12.5S9.24 7.5 12 7.5s5 2.24 5 5-2.24 5-5 5zm0-8a3 3 0 100 6 3 3 0 000-6z" />
     </svg>
 );
 
-const EyeSlashIcon = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" {...props}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.41a1.012 1.012 0 01.922-.387h12.15a1.012 1.012 0 01.922.387M21 12c-1.397 3.552-4.279 6.232-7.531 8.225-.262.163-.532.29-.8.401M3 12c1.397-3.552 4.279-6.232 7.531-8.225.262-.163.532-.29.8-.401M12 21a9 9 0 00.401-1.075" />
+const EyeSlashIcon = ({ className }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
+        <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.74C21.27 7.61 17 4.5 12 4.5c-1.77 0-3.39.53-4.74 1.44l2.92 2.92c.56-.23 1.17-.36 1.82-.36zm-4.6 11.14L6.26 17c-1.51-1.26-2.7-2.89-3.44-4.74C4.73 7.61 9 4.5 14 4.5c.2 0 .4.01.6.03l-1.58 1.58c-.56.23-1.17.36-1.82.36-2.76 0-5 2.24-5 5 0 .65.13 1.26.36 1.82L2.39 2.39 1.11 3.67l20.22 20.22 1.28-1.28-4.6-4.6z" />
     </svg>
 );
 
 const LoginForm = () => {
     const navigate = useNavigate();
     const { loginUser } = useAuth();
-    
+
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
@@ -53,20 +50,18 @@ const LoginForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setSuccess('');
         setLoading(true);
 
         const result = await loginUser(formData);
-        
+
         setLoading(false);
 
         if (result.success) {
-            setSuccess(result.message);
-            // Navigate to the prediction page
-            navigate('/user/predict');
+            toast.success(result.message);
+            // Sonner toasts are persistent, so the navigation can happen immediately.
+            navigate('/');
         } else {
-            setError(result.message);
+            toast.error(result.message);
         }
     };
 
@@ -121,14 +116,10 @@ const LoginForm = () => {
                     </a>
                 </div>
 
-                {/* Display Error/Success Messages */}
-                {error && <p className="text-center text-sm text-red-600">{error}</p>}
-                {success && <p className="text-center text-sm text-green-600">{success}</p>}
-
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-purple-300"
+                    className="w-full py-3 bg-purple-600 text-white cursor-pointer font-semibold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-purple-300"
                 >
                     {loading ? 'Logging In...' : 'Log In'}
                 </button>
