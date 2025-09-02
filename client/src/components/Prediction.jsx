@@ -1,7 +1,31 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useAuth } from '../store/auth';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
-// --- SVG Icons ---
+// Gemstone color mapping and SVG icons (unchanged)
+const gemstoneColors = {
+    'Ruby': '#E0115F',
+    'Sapphire': '#0F52BA',
+    'Emerald': '#50C878',
+    'Amethyst': '#9966CC',
+    'Onyx': '#36454F',
+    'Black Onyx': '#36454F',
+    'Sapphire Blue': '#0F52BA',
+    'Sapphire Yellow': '#FFD800',
+    'Turquoise': '#40E0D0',
+};
+
+const getGemstoneColor = (name) => {
+    const normalizedName = name?.trim()?.toLowerCase() || '';
+    for (const key in gemstoneColors) {
+        if (normalizedName.includes(key.toLowerCase())) {
+            return gemstoneColors[key];
+        }
+    }
+    return '#6B7280'; // Default gray color
+};
+
 const UploadIcon = () => (
     <svg className="w-16 h-16 text-purple-400 group-hover:text-purple-500 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -17,28 +41,24 @@ const ResetIcon = () => (
     <svg className="w-12 h-12 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h5M20 20v-5h-5M4 20h5v-5M20 4h-5v5" /></svg>
 );
 
-// Heart Icon for favoriting with hover effects
 const HeartIcon = ({ isFavorited, className, onClick }) => (
-    <svg 
+    <svg
         onClick={onClick}
-        className={`${className} cursor-pointer transition-transform duration-200 transform hover:scale-110`} 
-        xmlns="http://www.w3.org/2000/svg" 
-        viewBox="0 0 24 24" 
-        fill={isFavorited ? "currentColor" : "none"} 
-        stroke={isFavorited ? "none" : "white"} 
+        className={`${className} cursor-pointer transition-transform duration-200 transform hover:scale-110`}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill={isFavorited ? "currentColor" : "none"}
+        stroke={isFavorited ? "none" : "white"}
         strokeWidth={isFavorited ? "0" : "1.5"}
     >
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
     </svg>
 );
 
-
-// --- Camera Capture Component ---
 const CameraCapture = ({ onCapture, onCancel }) => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
 
-    // Start the camera stream
     useEffect(() => {
         async function getCameraStream() {
             try {
@@ -48,12 +68,12 @@ const CameraCapture = ({ onCapture, onCancel }) => {
                 }
             } catch (err) {
                 console.error("Error accessing camera:", err);
+                toast.error("Error accessing camera. Please check permissions.");
                 onCancel();
             }
         }
         getCameraStream();
 
-        // Cleanup: stop the stream when the component unmounts
         return () => {
             if (videoRef.current && videoRef.current.srcObject) {
                 videoRef.current.srcObject.getTracks().forEach(track => track.stop());
@@ -78,17 +98,17 @@ const CameraCapture = ({ onCapture, onCancel }) => {
             <video ref={videoRef} autoPlay playsInline className="w-full max-w-lg rounded-lg"></video>
             <canvas ref={canvasRef} className="hidden"></canvas>
             <div className="mt-4 flex space-x-4">
-                <button onClick={handleCapture} className="px-6 py-2 bg-purple-600 text-white rounded-lg">Capture</button>
-                <button onClick={onCancel} className="px-6 py-2 bg-gray-600 text-white rounded-lg">Cancel</button>
+                <button onClick={handleCapture} className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">Capture</button>
+                <button onClick={onCancel} className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">Cancel</button>
             </div>
         </div>
     );
 };
 
 const Prediction = () => {
-    // Access auth state from the context
     const { isLoggedIn, token } = useAuth();
-    
+    const navigate = useNavigate();
+
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [predictionResult, setPredictionResult] = useState(null);
@@ -96,11 +116,16 @@ const Prediction = () => {
     const [error, setError] = useState('');
     const [showUploadOptions, setShowUploadOptions] = useState(false);
     const [showCamera, setShowCamera] = useState(false);
-    const [isFavorited, setIsFavorited] = useState(false); 
+    const [isFavorited, setIsFavorited] = useState(false);
+    const [currentPredictionId, setCurrentPredictionId] = useState(null);
 
     const fileInputRef = useRef(null);
 
-    // Conditionally set the API URI based on login status
+    const triggerFileInput = () => {
+        fileInputRef.current.click();
+        setShowUploadOptions(false);
+    };
+
     const URI = isLoggedIn ? '/api/v1/predictions/user/predict' : '/api/v1/predictions/guest/predict';
 
     const handleFileChange = (event) => {
@@ -110,39 +135,43 @@ const Prediction = () => {
             setPreviewUrl(URL.createObjectURL(file));
             setPredictionResult(null);
             setError('');
-            setIsFavorited(false); 
+            setIsFavorited(false);
+            setCurrentPredictionId(null); // Explicitly reset ID here too
         } else {
             setError('Please select a valid image file.');
             setSelectedFile(null);
             setPreviewUrl('');
             setIsFavorited(false);
+            setCurrentPredictionId(null); // Explicitly reset ID here too
+            toast.error('Please select a valid image file (PNG, JPG, or WEBP).');
         }
     };
-    
+
     const handleCameraCapture = useCallback((imageBlob) => {
         const capturedFile = new File([imageBlob], "camera-capture.jpg", { type: "image/jpeg" });
         setSelectedFile(capturedFile);
         setPreviewUrl(URL.createObjectURL(capturedFile));
         setPredictionResult(null);
         setError('');
-        setIsFavorited(false); 
+        setIsFavorited(false);
+        setCurrentPredictionId(null); // Explicitly reset ID here too
         setShowCamera(false);
     }, []);
-
 
     const handlePredict = async () => {
         if (!selectedFile) {
             setError('Please upload an image first.');
+            toast.error('Please upload an image first.');
             return;
         }
         setIsLoading(true);
         setError('');
         setPredictionResult(null);
+        setCurrentPredictionId(null); // IMPORTANT: Reset ID right before the API call to prevent stale data.
 
         const formData = new FormData();
         formData.append('image', selectedFile);
 
-        // Conditionally add Authorization header if the user is logged in
         const headers = {};
         if (isLoggedIn) {
             headers['Authorization'] = `Bearer ${token}`;
@@ -156,80 +185,108 @@ const Prediction = () => {
             });
 
             const result = await response.json();
+            console.log("Prediction Result:", result);
 
             if (!response.ok) {
                 throw new Error(result.message || 'An error occurred during prediction.');
             }
-            
+
+            const newPrediction = {
+                _id: result.data._id,
+                imageUrl: result.data.imageUrl,
+                gemstoneName: result.data.gemstoneName,
+                isFavorited: result.data.isFavorited || false,
+            };
+
             setPredictionResult({
-                image: result.data.imageUrl,
-                name: result.data.gemstoneName,
+                image: newPrediction.imageUrl,
+                name: newPrediction.gemstoneName,
             });
+
+            // CRITICAL: Set the ID immediately after a successful response.
+            setCurrentPredictionId(newPrediction._id);
+            setIsFavorited(newPrediction.isFavorited);
+
+            toast.success('Prediction successful!');
 
         } catch (error) {
             setError(error.message);
             console.error("Prediction API error:", error);
+            toast.error(`Prediction failed: ${error.message}`);
+            setCurrentPredictionId(null); // Ensure ID is null on error
         } finally {
             setIsLoading(false);
         }
     };
 
-    const triggerFileInput = () => {
-        fileInputRef.current.click();
+    const handleReset = () => {
+        setSelectedFile(null);
+        setPreviewUrl('');
+        setPredictionResult(null);
+        setError('');
+        setIsFavorited(false);
+        setCurrentPredictionId(null); // Ensure ID is null on manual reset
         setShowUploadOptions(false);
     };
 
-    const handleUploadBoxClick = () => {
-        if (predictionResult) {
-            setSelectedFile(null);
-            setPreviewUrl('');
-            setPredictionResult(null);
-            setError('');
-            setIsFavorited(false); 
-        } else if (!previewUrl) {
-            setShowUploadOptions(true);
-        }
-    };
-
     const handleToggleFavorite = async (e) => {
-        e.stopPropagation(); 
-        
+        e.stopPropagation();
+
         if (!isLoggedIn) {
-            console.log("Please log in to favorite images.");
+            toast.error("Please log in to favorite images.");
             setError("Please log in to favorite images.");
             return;
         }
 
-        setIsFavorited(prev => !prev);
-        const newFavoriteStatus = !isFavorited;
+        if (!currentPredictionId) {
+            toast.error("No prediction to favorite. The prediction ID is missing.");
+            return;
+        }
 
-        const favoriteURI = '/api/v1/favorites';
-        
+        const newFavoriteStatus = !isFavorited;
+        setIsFavorited(newFavoriteStatus);
+
+        let fetchUrl;
+        let method;
+
+        if (newFavoriteStatus) {
+            fetchUrl = '/api/v1/favorites';
+            method = 'POST';
+        } else {
+            fetchUrl = `/api/v1/favorites/${currentPredictionId}`;
+            method = 'DELETE';
+        }
+
         try {
-            const response = await fetch(favoriteURI, {
-                method: 'POST',
+            const response = await fetch(fetchUrl, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({
-                    imageUrl: predictionResult.image,
-                    gemstoneName: predictionResult.name,
-                    isFavorited: newFavoriteStatus
-                }),
+                body: newFavoriteStatus ? JSON.stringify({ predictionId: currentPredictionId }) : null,
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to save favorite.');
+                throw new Error(errorData.message || 'Failed to update favorite status.');
             }
-            
-            const result = await response.json();
-            console.log("Favorite saved:", result);
 
+            const actionMessage = newFavoriteStatus ? "Added to favorites!" : "Removed from favorites.";
+            toast.success(actionMessage);
         } catch (err) {
             console.error("Favorite API error:", err);
             setError(err.message);
+            setIsFavorited(!newFavoriteStatus);
+            toast.error(err.message);
+        }
+    };
+
+    const handleViewDetails = () => {
+        if (predictionResult && predictionResult.name) {
+            const gemNameSlug = predictionResult.name.replace(/[\s_]/g, '');
+            console.log("Navigating to:", `/gemstone/${gemNameSlug}`);
+            navigate(`/gemstone/${gemNameSlug}`);
         }
     };
 
@@ -242,26 +299,18 @@ const Prediction = () => {
                 </div>
 
                 <div className="flex flex-col lg:flex-row items-center justify-center gap-8 w-full max-w-5xl">
-                    <div 
+                    <div
                         className="w-full lg:w-1/3 h-80 bg-white rounded-2xl border-2 border-dashed border-gray-300 flex flex-col justify-center items-center text-center p-4 cursor-pointer group hover:border-purple-400 transition-all duration-300 shadow-sm"
-                        onClick={handleUploadBoxClick}
+                        onClick={!previewUrl ? () => setShowUploadOptions(true) : null}
                     >
                         <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
                         {previewUrl ? (
                             <div className="relative w-full h-full">
                                 <img src={previewUrl} alt="Selected Gem" className="w-full h-full object-cover rounded-xl" />
-                                {isLoggedIn && (
-                                    <HeartIcon 
-                                        isFavorited={isFavorited} 
-                                        onClick={handleToggleFavorite} 
-                                        className={`absolute top-3 right-3 w-10 h-10 ${isFavorited ? 'text-red-500' : 'text-white'}`} 
-                                    />
-                                )}
                                 {predictionResult && (
-                                    <div className="absolute inset-0 bg-black bg-opacity-60 flex flex-col items-center justify-center rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <div className="absolute inset-0 bg-black bg-opacity-60 flex flex-col items-center justify-center rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" onClick={handleReset}>
                                         <ResetIcon />
                                         <p className="text-white font-semibold">Predict Another</p>
-                                        <p className="text-white text-sm">Click to start over</p>
                                     </div>
                                 )}
                             </div>
@@ -275,29 +324,40 @@ const Prediction = () => {
                     </div>
 
                     <div className="flex-shrink-0">
-                        <button onClick={handlePredict} disabled={!selectedFile || isLoading} className="px-10 py-4 bg-purple-600 text-white rounded-2xl font-bold text-xl hover:bg-purple-700 transition-all duration-300 shadow-lg transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100">
+                        <button onClick={handlePredict} disabled={!selectedFile || isLoading} className="px-10 cursor-pointer py-4 bg-purple-600 text-white rounded-2xl font-bold text-xl hover:bg-purple-700 transition-all duration-300 shadow-lg transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100">
                             {isLoading ? 'Analyzing...' : 'PREDICT'}
                         </button>
                     </div>
 
                     <div className="w-full lg:w-1/3 h-80 p-2 bg-white rounded-2xl shadow-lg flex flex-col justify-center items-center">
                         {predictionResult ? (
-                            <div className="relative w-full h-full text-center">
-                                <img src={predictionResult.image} alt="Gem Prediction Result" className="w-full h-5/6 object-cover rounded-xl" />
-                                {isLoggedIn && (
-                                    <HeartIcon
-                                        isFavorited={isFavorited} 
-                                        onClick={handleToggleFavorite} 
-                                        className={`absolute top-3 right-3 w-10 h-10 ${isFavorited ? 'text-red-500' : 'text-white'}`} 
-                                    />
-                                )}
-                                <div className="mt-2">
-                                    <p className="text-2xl font-bold text-gray-800">{predictionResult.name}</p>
-                                    {isLoggedIn ? (
-                                        <p className="text-sm text-purple-600 font-semibold">Saved to your upload history!</p>
-                                    ) : (
-                                        <p className="text-sm text-gray-500">Log in to save your history and favorite gems.</p>
-                                    )}
+                            <div className="relative w-full h-full text-center p-4">
+                                <img src={predictionResult.image} alt="Gem Prediction Result" className="w-full h-4/6 object-contain rounded-xl" />
+                                <div className="mt-4">
+                                    <p className="text-2xl font-bold text-gray-800" style={{ color: getGemstoneColor(predictionResult.name) }}>
+                                        {predictionResult.name}
+                                    </p>
+                                    <div className="mt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
+                                        {isLoggedIn && (
+                                            <button
+                                                onClick={handleToggleFavorite}
+                                                className="flex items-center cursor-pointer justify-center px-4 py-2 rounded-full text-white transition-colors text-sm"
+                                                style={{ backgroundColor: isFavorited ? '#ef4444' : '#9ca3af' }}
+                                            >
+                                                <HeartIcon
+                                                    isFavorited={isFavorited}
+                                                    className="w-5 h-5 mr-2 text-white"
+                                                />
+                                                {isFavorited ? 'Favorited' : 'Add to Favorites'}
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={handleViewDetails}
+                                            className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-full text-sm font-medium cursor-pointer hover:bg-purple-700 transition-colors"
+                                        >
+                                            Learn More
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         ) : (
@@ -307,26 +367,24 @@ const Prediction = () => {
                         )}
                     </div>
                 </div>
-                
+
                 {error && <p className="mt-8 text-red-500 font-medium">{error}</p>}
             </div>
 
-            {/* Upload Options Modal */}
             {showUploadOptions && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40" onClick={() => setShowUploadOptions(false)}>
                     <div className="bg-white rounded-lg p-8 space-y-4" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-xl font-semibold text-center mb-4">Choose an option</h3>
-                        <button onClick={() => { setShowCamera(true); setShowUploadOptions(false); }} className="w-full flex items-center justify-center px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-lg font-medium">
+                        <button onClick={() => { setShowCamera(true); setShowUploadOptions(false); }} className="w-full flex items-center justify-center cursor-pointer px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-lg font-medium">
                             <CameraIcon /> Open Camera
                         </button>
-                        <button onClick={triggerFileInput} className="w-full flex items-center justify-center px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-lg font-medium">
+                        <button onClick={triggerFileInput} className="w-full cursor-pointer flex items-center justify-center px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-lg font-medium">
                             <FileUploadIcon /> Upload File
                         </button>
                     </div>
                 </div>
             )}
 
-            {/* Camera View */}
             {showCamera && <CameraCapture onCapture={handleCameraCapture} onCancel={() => setShowCamera(false)} />}
         </>
     );

@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../store/auth';
+import { toast } from 'sonner';
 
 const Profile = () => {
-    const { user, isLoading } = useAuth(); // Destructure user and a new isLoading state
+    const { user, isLoading, token } = useAuth();
 
-    // Use a local state to handle the profile data
+    // State for user profile details
     const [userProfile, setUserProfile] = useState({
         fullName: "",
         username: "",
         email: "",
         profilePicture: null,
         favoriteCount: 0,
-        uploadHistory: []
     });
 
-    // Use a useEffect hook to update the local state when the user data from the context changes
+    // State for the fetched history items
+    const [historyItems, setHistoryItems] = useState([]);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+
+    // Effect to update user profile details when the user object changes
     useEffect(() => {
         if (user) {
             setUserProfile({
@@ -24,12 +28,60 @@ const Profile = () => {
                 email: user.email,
                 profilePicture: user.avatar,
                 favoriteCount: user.favorites ? user.favorites.length : 0,
-                uploadHistory: user.predictions || []
             });
         }
-    }, [user]); // The effect runs whenever the 'user' object from the context changes
+    }, [user]);
 
-    // Handle the loading state
+    // Effect to fetch upload history when the user's predictions array changes
+    useEffect(() => {
+        const fetchUploadHistory = async () => {
+            if (!user?.predictions?.length || !token) {
+                setHistoryItems([]);
+                return;
+            }
+
+            setIsHistoryLoading(true);
+            try {
+                // Get the last 6 prediction IDs. The slice(-6) method
+                // is used to get the most recent six items from the end of the array.
+                const recentPredictionIds = user.predictions.slice(-8);
+                
+                // Fetch the full prediction objects from the backend
+                const response = await fetch('/api/v1/predictions/get-multiple', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ ids: recentPredictionIds }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch upload history');
+                }
+
+                const result = await response.json();
+                if (result.success) {
+                    // Sort by creation date to ensure the most recent are displayed first
+                    // The .sort() method with a custom comparison function is used for this.
+                    const sortedHistory = result.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    setHistoryItems(sortedHistory);
+                } else {
+                    throw new Error(result.message || 'An error occurred fetching history.');
+                }
+            } catch (err) {
+                console.error("Error fetching upload history:", err);
+                toast.error(err.message || 'Could not load upload history.');
+                setHistoryItems([]);
+            } finally {
+                setIsHistoryLoading(false);
+            }
+        };
+
+        fetchUploadHistory();
+    }, [user?.predictions, token]); // Re-run this effect when user.predictions or token changes
+
+    // Handle the initial loading state for user data
     if (isLoading || !user) {
         return <div className="min-h-screen flex items-center justify-center text-gray-500">Loading profile...</div>;
     }
@@ -49,7 +101,7 @@ const Profile = () => {
                     <div className="flex flex-col items-center mb-10">
                         {/* Profile Picture */}
                         <div className="relative w-40 h-40 rounded-full bg-pink-200 flex items-center justify-center overflow-hidden mb-6 shadow-md border-2 border-purple-100">
-                            <img src={userProfile.profilePicture || "https://via.placeholder.com/150"} alt="Profile" className="w-full h-full object-cover" />
+                            <img src={userProfile.profilePicture || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxZWf0l9giN9QZsq3KEs_fZMTy2EiiukBzXg&s"} alt="Profile" className="w-full h-full object-cover" draggable={false}/>
                         </div>
 
                         {/* Information Boxes with Labels */}
@@ -79,7 +131,7 @@ const Profile = () => {
                             </div>
 
                             {/* Favorites Link */}
-                            <Link to="/favorites" className="block bg-purple-100 text-purple-700 font-bold px-4 py-3 rounded-lg text-center shadow-sm hover:bg-purple-200 transition-colors border border-purple-200">
+                            <Link to="/favorite-gems" className="block bg-purple-100 text-purple-700 font-bold px-4 py-3 rounded-lg text-center shadow-sm hover:bg-purple-200 transition-colors border border-purple-200">
                                 {userProfile.favoriteCount > 0 ? `Favorites (${userProfile.favoriteCount})` : "No Favorites Yet"}
                             </Link>
                         </div>
@@ -88,11 +140,14 @@ const Profile = () => {
                     {/* Upload History */}
                     <div className="mt-12">
                         <h2 className="text-2xl font-bold text-gray-800 mb-6">Upload History</h2>
-                        {userProfile.uploadHistory && userProfile.uploadHistory.length > 0 ? (
+                        <p className="text-xl text-gray-500 mb-6">Recent Uploads by <span className="text-amber-500">{userProfile.username} </span></p>
+                        {isHistoryLoading ? (
+                            <div className="text-center text-gray-500 p-8">Loading history...</div>
+                        ) : historyItems.length > 0 ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                {userProfile.uploadHistory.map((item) => (
+                                {historyItems.map((item) => (
                                     <div key={item._id} className="w-full aspect-square bg-gray-100 rounded-lg overflow-hidden shadow-sm border border-gray-200 flex items-center justify-center">
-                                        <img src={item.imageUrl} alt={item.alt} className="w-full h-full object-cover" />
+                                        <img src={item.imageUrl} alt={item.gemstoneName || `Gemstone prediction`} className="w-full h-full object-cover" draggable={false} />
                                     </div>
                                 ))}
                             </div>

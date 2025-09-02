@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { predictAsGuest, predictAsUser 
+import { 
+  predictAsGuest,
+  predictAsUser,
+  getMultiplePredictions
 } from "../controllers/predictGemstone.controller.js";
 import { VerifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -20,5 +23,7 @@ router.route("/user/predict").post(
   upload.single("image"), 
   predictAsUser
 );
+// --- Route for Upload History ---
+router.route("/get-multiple").post(VerifyJWT, getMultiplePredictions);
 
 export default router;
