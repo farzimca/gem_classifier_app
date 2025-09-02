@@ -48,10 +48,10 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Connect With Us</h3>
             <div className="flex justify-center md:justify-start items-center space-x-4">
-              <a href="mailto:webdevlrn@gmail.com" target='_blank' rel='noopener noreferrer' className="text-gray-400 hover:text-purple-400 transition-colors" aria-label="Email">
+              <a href="mailto:gemx.gemexplorer@gmail.com" target='_blank' rel='noopener noreferrer' className="text-gray-400 hover:text-purple-400 transition-colors" aria-label="Email">
                 <EnvelopeIcon />
               </a>
-              <a href="https://github.com" target='_blank' rel='noopener noreferrer' className="text-gray-400 hover:text-purple-400 transition-colors" aria-label="GitHub">
+              <a href="https://github.com/farzimca" target='_blank' rel='noopener noreferrer' className="text-gray-400 hover:text-purple-400 transition-colors" aria-label="GitHub">
                 <GithubIcon />
               </a>
             </div>
