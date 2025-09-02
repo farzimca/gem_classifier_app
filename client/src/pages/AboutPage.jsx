@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import animatedGemImage from '../assets/Vibrant Geometric Gemstone in Gradient Light.png';
+import { SiGooglescholar } from 'react-icons/si';
 
 // SVG Icons as components
 const GithubIcon = () => (
@@ -167,7 +168,12 @@ const AboutPage = () => {
             transition={{ delay: 0.3, duration: 0.7 }}
             loading="lazy"
           />
-          <h3 className="text-2xl font-semibold mb-1">Prof. Vinod Sharma</h3>
+          <h3 className="text-2xl font-semibold mb-1">
+            Prof. Vinod Sharma
+            <a href="https://scholar.google.com/citations?user=7VeULkEAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" className="inline-block align-middle ml-2">
+              <SiGooglescholar size={24} className="text-purple-600 hover:text-purple-800 transition-colors" />
+            </a>
+          </h3>
           <p className="text-purple-600 font-medium mb-3">Jammu University</p>
           <p className="max-w-xl mx-auto leading-relaxed text-gray-700">
             We are immensely grateful for the invaluable guidance and support provided by Prof. Vinod Sharma, whose expertise has been instrumental in shaping this project.
@@ -190,16 +196,16 @@ const AboutPage = () => {
           <DeveloperCard
             name="Himanshu Parihar"
             image="https://media.licdn.com/dms/image/v2/D4D03AQG7gC8OJStToQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1689518512932?e=1759363200&v=beta&t=1x-cmCSN1oWp25FarSCMUgxtxdtbBpf7DR3EruA0xt8"
-            draggable={false}
             github="https://www.github.com/pariharx7"
-            linkedin="#"
+            draggable={false}
+            linkedin="https://www.linkedin.com/in/himanshuparihar07/"
           />
           <DeveloperCard
             name="Agrim Sharma"
             image="https://avatars.githubusercontent.com/u/182859960?v=4"
-            draggable={false}
             github="https://www.github.com/codeagrim"
-            linkedin="#"
+            linkedin="https://www.linkedin.com/in/agrim-sharma-240b02249/"
+            draggable={false}
           />
         </div>
       </section>
