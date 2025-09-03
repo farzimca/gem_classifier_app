@@ -22,7 +22,7 @@ export const register = asyncHandler(async (req, res) => {
   }
 
   // 3. Get avatar file
-  const avatarFile = req.file?.path;
+  const avatarFile = req.file?.buffer;
   if (!avatarFile) {
     throw new ApiError(400, "Avatar file is required");
   }
