@@ -322,7 +322,7 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 export const AvatarUpdate = asyncHandler(async (req, res) => {
-  const avatarFile = req.file?.path;
+  const avatarFile = req.file?.buffer;
 
   if (!avatarFile) {
     throw new ApiError(400, "Avatar File is required");

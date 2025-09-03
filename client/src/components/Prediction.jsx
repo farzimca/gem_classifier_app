@@ -62,24 +62,38 @@ const CameraCapture = ({ onCapture, onCancel }) => {
     useEffect(() => {
         async function getCameraStream() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: "environment", // Prioritize back camera
+                    },
+                });
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
                 }
             } catch (err) {
                 console.error("Error accessing camera:", err);
                 toast.error("Error accessing camera. Please check permissions.");
-                onCancel();
+                try {
+                    const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    if (videoRef.current) {
+                        videoRef.current.srcObject = fallbackStream;
+                    }
+                } catch (fallbackErr) {
+                    console.error("Error accessing fallback camera:", fallbackErr);
+                    toast.error("No camera available. Please check permissions or device capabilities.");
+                    onCancel();
+                }
             }
-        }
-        getCameraStream();
+            }
 
-        return () => {
-            if (videoRef.current && videoRef.current.srcObject) {
-                videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-            }
-        };
-    }, [onCancel]);
+            getCameraStream();
+
+            return () => {
+                if (videoRef.current && videoRef.current.srcObject) {
+                    videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+                }
+            };
+        }, [onCancel]);
 
     const handleCapture = () => {
         if (videoRef.current && canvasRef.current) {
@@ -89,7 +103,7 @@ const CameraCapture = ({ onCapture, onCancel }) => {
             context.drawImage(videoRef.current, 0, 0, videoRef.current.videoWidth, videoRef.current.videoHeight);
             canvasRef.current.toBlob(blob => {
                 onCapture(blob);
-            }, 'image/jpeg');
+            }, 'image/jpeg', 0.9);
         }
     };
 
