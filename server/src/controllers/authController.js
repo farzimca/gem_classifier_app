@@ -64,7 +64,7 @@ Welcome to GEMX! We're thrilled to have you join our community.
 
 You're now ready to explore the fascinating world of gemstones with the power of AI. To get started, simply visit our prediction page and upload an image.
 
-Start Predicting: https://gemx-frontend-eta.vercel.app/predict  // Replace with your actual frontend URL
+Start Predicting: https://gemx-frontend-eta.vercel.app  // Replace with your actual frontend URL
 
 Happy exploring!
 
@@ -103,7 +103,7 @@ const welcomeHtml = `
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                     <tr>
                         <td align="center">
-                            <a href="https://gemx-frontend-eta.vercel.app/predict" target="_blank" style="display: inline-block; padding: 15px 30px; font-size: 18px; font-weight: bold; color: #ffffff; background-color: #8B5CF6; text-decoration: none; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                            <a href="https://gemx-frontend-eta.vercel.app" target="_blank" style="display: inline-block; padding: 15px 30px; font-size: 18px; font-weight: bold; color: #ffffff; background-color: #8B5CF6; text-decoration: none; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
                                 Start Predicting Now
                             </a>
                         </td>
