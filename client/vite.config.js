@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   server: {
     proxy: {
-      '/api': import.meta.env.VITE_BACKEND_URL   // modify this to backend link in production
+      '/api': "https://gemx-backend.vercel.app"   // modify this to backend link in production
     },
   },
   plugins: [
