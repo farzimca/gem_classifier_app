@@ -549,7 +549,8 @@ export const resetPassword = asyncHandler(async (req, res) => {
 
   const { token, newPassword, confirmPassword } = req.body;
 
-
+  newPassword = newPassword?.trim();
+  confirmPassword = confirmPassword?.trim();
 
   if (!token || !newPassword || !confirmPassword) {
     throw new ApiError(400, "Token and passwords are required");
