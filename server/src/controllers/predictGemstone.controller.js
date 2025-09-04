@@ -20,102 +20,131 @@ const ML_API_URL = "https://mcaxmca-gem-1.hf.space/predict";
  * @param {string} mimetype - The mimetype of the image (e.g., 'image/jpeg').
  * @returns {Promise<string>} The predicted gemstone name.
  */
-const getPredictionFromMLService = async (imagePath, mimetype) => {
+// const getPredictionFromMLService = async (imagePath, mimetype) => {
+//   try {
+//     const formData = new FormData();
+//     // The field name "image" must match what the FastAPI endpoint expects.
+//     formData.append("file", fs.createReadStream(imagePath), {
+//       contentType: mimetype,
+//       filename: "gemstone.jpg", // A placeholder filename is needed
+//     });
+
+//     const response = await axios.post(ML_API_URL, formData, {
+//       headers: formData.getHeaders(),
+//     });
+
+//     if (!response.data || !response.data.gemstoneName) {
+//         throw new Error("Invalid response from prediction service.");
+//     }
+
+//     return response.data.gemstoneName;
+//   } catch (error) {
+//     console.error("❌ Error calling ML service:", error.response?.data || error.message);
+//     throw new ApiError(502, "The prediction service is currently unavailable or failed."); // 502 Bad Gateway is appropriate here
+//   }
+// };
+
+
+// --- REFACTORED Controller for GUEST Users ---
+
+const getPredictionFromMLService = async (fileBuffer, mimetype) => {
   try {
     const formData = new FormData();
-    // The field name "image" must match what the FastAPI endpoint expects.
-    formData.append("file", fs.createReadStream(imagePath), {
+
+    formData.append("file", fileBuffer, {
       contentType: mimetype,
-      filename: "gemstone.jpg", // A placeholder filename is needed
+      filename: "gemstone.jpg",
     });
 
     const response = await axios.post(ML_API_URL, formData, {
       headers: formData.getHeaders(),
+      maxBodyLength: Infinity, // important for large images
     });
 
     if (!response.data || !response.data.gemstoneName) {
-        throw new Error("Invalid response from prediction service.");
+      throw new Error("Invalid response from prediction service.");
     }
 
     return response.data.gemstoneName;
   } catch (error) {
     console.error("❌ Error calling ML service:", error.response?.data || error.message);
-    throw new ApiError(502, "The prediction service is currently unavailable or failed."); // 502 Bad Gateway is appropriate here
+    throw new ApiError(502, "The prediction service is currently unavailable or failed.");
   }
 };
 
 
-// --- REFACTORED Controller for GUEST Users ---
 export const predictAsGuest = asyncHandler(async (req, res) => {
-  const localImagePath = req.file?.path;
-  if (!localImagePath) {
+  if (!req.file || !req.file.buffer) {
     throw new ApiError(400, "Image file is required.");
   }
 
   try {
-    // 1. Get prediction instantly from our fast ML microservice
-    const predictedClass = await getPredictionFromMLService(localImagePath, req.file.mimetype);
+    // 1. Send buffer to ML microservice
+    const predictedClass = await getPredictionFromMLService(req.file.buffer, req.file.mimetype);
 
-    // 2. Convert original image to Base64 to send back to the user
-    const imageBuffer = fs.readFileSync(localImagePath);
-    const base64Image = `data:${req.file.mimetype};base64,${imageBuffer.toString('base64')}`;
+    // 2. Convert buffer to base64 for returning preview
+    const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
 
-    // 3. Send the successful response
+    // 3. Send response back to user
     return res.status(200).json(
-      new ApiResponse(200, { gemstoneName: predictedClass, imageUrl: base64Image }, "Prediction successful")
+      new ApiResponse(
+        200,
+        { gemstoneName: predictedClass, imageUrl: base64Image },
+        "Prediction successful"
+      )
     );
-  } finally {
-    // 4. Always clean up the temporary file
-    if (fs.existsSync(localImagePath)) {
-      fs.unlinkSync(localImagePath);
-    }
+  } catch (error) {
+    console.error("❌ Prediction failed:", error.message);
+    throw error;
   }
 });
 
 
+
 // --- REFACTORED Controller for LOGGED-IN Users ---
 export const predictAsUser = asyncHandler(async (req, res) => {
-  const localImagePath = req.file?.path;
-  if (!localImagePath) {
+  if (!req.file || !req.file.buffer) {
     throw new ApiError(400, "Image file is required.");
   }
 
   try {
-    // 1. Get prediction instantly from our fast ML microservice
-    const predictedClass = await getPredictionFromMLService(localImagePath, req.file.mimetype);
+    // 1. Send buffer to ML microservice
+    const predictedClass = await getPredictionFromMLService(req.file.buffer, req.file.mimetype);
 
-    // 2. Upload the original image to Cloudinary for permanent storage
-    const uploadedImage = await uploadOnCloudinary(localImagePath);
+    // 2. Upload image buffer to Cloudinary
+    const uploadedImage = await uploadOnCloudinary(req.file.buffer);
     if (!uploadedImage?.url) {
       throw new ApiError(500, "Failed to upload image to Cloudinary.");
     }
 
-    // 3. Save the prediction result to your database
+    // 3. Save prediction to MongoDB
     const prediction = await Prediction.create({
       user: req.myUser._id,
       gemstoneName: predictedClass,
-      imageUrl: uploadedImage.url, // Use the permanent Cloudinary URL
+      imageUrl: uploadedImage.url,
       result: predictedClass,
     });
 
-    // 4. Link the new prediction to the user's history
+    // 4. Link prediction to user
     await User.findByIdAndUpdate(req.myUser._id, {
       $push: { predictions: prediction._id },
     });
 
-    // 5. Send the successful response
+    // 5. Send response
     return res.status(201).json(
-      new ApiResponse(201, {
+      new ApiResponse(
+        201,
+        {
           gemstoneName: predictedClass,
           imageUrl: uploadedImage.url,
           _id: prediction._id,
-        }, "Prediction successful and saved")
+        },
+        "Prediction successful and saved"
+      )
     );
-  } finally {
-    // 6. Always clean up the temporary file
-    if (fs.existsSync(localImagePath)) {
-      fs.unlinkSync(localImagePath);
-    }
+  } catch (error) {
+    console.error("❌ Prediction failed:", error.message);
+    throw error;
   }
 });
 

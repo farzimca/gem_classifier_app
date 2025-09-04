@@ -1,66 +1,57 @@
 import { v2 as cloudinary } from "cloudinary";
-import fs from "fs";
 import dotenv from "dotenv";
+import streamifier from "streamifier";
+
 dotenv.config();
 
-
-// IIFE given by cloudinary
-
-
-// Cbut we did in Chai Code Configuration with cloudinary
+// Cloudinary configuration
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Upload on Cloudinary
+/**
+ * Upload file buffer directly to Cloudinary
+ * @param {Buffer} fileBuffer - The image file buffer
+ * @param {string} folder - Optional folder name
+ * @returns {Promise<object>} Cloudinary response
+ */
+export const uploadOnCloudinary = (fileBuffer, folder = "gemstone-predictions") => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: "auto" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
 
-async function uploadOnCloudinary(FilePath) {
-  try {
-    if (!FilePath) {
-      return null; // return error message also
-    }
+    // Convert buffer to stream and send to Cloudinary
+    streamifier.createReadStream(fileBuffer).pipe(uploadStream);
+  });
+};
 
-    const uploadResponse = await cloudinary.uploader
-      .upload(FilePath,{
-          resource_type: "auto",
-        })
-// file is Uploaded
-    fs.unlinkSync(FilePath)
-    return uploadResponse;
-
-
-  } catch(error) {
-    fs.unlinkSync(FilePath) // remove the temp files as the file operation failed
-    console.log(error);
-    return null;
+/**
+ * Delete a file from Cloudinary using its URL
+ * @param {string} url - The full Cloudinary URL of the image
+ * @returns {Promise<object>} Cloudinary response
+ */
+export const deleteOnCloudinary = async (url) => {
+  if (!url) {
+    throw new Error("No URL provided for deletion.");
   }
-}
 
+  try {
+    const parts = url.split("/");
+    const fileName = parts[parts.length - 1];
+    const public_id = fileName.split(".")[0]; // Extract ID before file extension
 
-
-
-async function deleteOnCloudinary(url) {
-    
-
-    // i know this may not be the best way to do
-const parts = url.split('/');
-  const public_id = parts[parts.length - 1].split('.')[0]; 
-  
-
-   try {
-     const deleteImage = cloudinary.uploader.destroy(public_id);
-     return deleteImage;
-   } catch (err) {
-
-    
-    throw new Error("Failed to delete file from Cloudinary", err);
-    
-   }
-}
-
-
-
-
-export {uploadOnCloudinary, deleteOnCloudinary}
+    // Delete file by public ID
+    const response = await cloudinary.uploader.destroy(public_id);
+    return response;
+  } catch (err) {
+    console.error("❌ Failed to delete file from Cloudinary:", err.message);
+    throw new Error("Failed to delete file from Cloudinary");
+  }
+};
