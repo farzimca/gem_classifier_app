@@ -120,7 +120,8 @@ const CameraCapture = ({ onCapture, onCancel }) => {
 };
 
 const Prediction = () => {
-    const { isLoggedIn, token } = useAuth();
+    // ⭐ Modified to include fetchUserData
+    const { isLoggedIn, token, fetchUserData } = useAuth();
     const navigate = useNavigate();
 
     const [selectedFile, setSelectedFile] = useState(null);
@@ -150,13 +151,13 @@ const Prediction = () => {
             setPredictionResult(null);
             setError('');
             setIsFavorited(false);
-            setCurrentPredictionId(null); // Explicitly reset ID here too
+            setCurrentPredictionId(null);
         } else {
             setError('Please select a valid image file.');
             setSelectedFile(null);
             setPreviewUrl('');
             setIsFavorited(false);
-            setCurrentPredictionId(null); // Explicitly reset ID here too
+            setCurrentPredictionId(null);
             toast.error('Please select a valid image file (PNG, JPG, or WEBP).');
         }
     };
@@ -168,7 +169,7 @@ const Prediction = () => {
         setPredictionResult(null);
         setError('');
         setIsFavorited(false);
-        setCurrentPredictionId(null); // Explicitly reset ID here too
+        setCurrentPredictionId(null);
         setShowCamera(false);
     }, []);
 
@@ -181,7 +182,7 @@ const Prediction = () => {
         setIsLoading(true);
         setError('');
         setPredictionResult(null);
-        setCurrentPredictionId(null); // IMPORTANT: Reset ID right before the API call to prevent stale data.
+        setCurrentPredictionId(null);
 
         const formData = new FormData();
         formData.append('image', selectedFile);
@@ -217,17 +218,21 @@ const Prediction = () => {
                 name: newPrediction.gemstoneName,
             });
 
-            // CRITICAL: Set the ID immediately after a successful response.
             setCurrentPredictionId(newPrediction._id);
             setIsFavorited(newPrediction.isFavorited);
 
             toast.success('Prediction successful!');
 
+            // ⭐ CRITICAL FIX: Call fetchUserData() after a successful prediction
+            if (isLoggedIn) {
+                await fetchUserData();
+            }
+
         } catch (error) {
             setError(error.message);
             console.error("Prediction API error:", error);
             toast.error(`Prediction failed: ${error.message}`);
-            setCurrentPredictionId(null); // Ensure ID is null on error
+            setCurrentPredictionId(null);
         } finally {
             setIsLoading(false);
         }
@@ -239,7 +244,7 @@ const Prediction = () => {
         setPredictionResult(null);
         setError('');
         setIsFavorited(false);
-        setCurrentPredictionId(null); // Ensure ID is null on manual reset
+        setCurrentPredictionId(null);
         setShowUploadOptions(false);
     };
 
@@ -288,6 +293,10 @@ const Prediction = () => {
 
             const actionMessage = newFavoriteStatus ? "Added to favorites!" : "Removed from favorites.";
             toast.success(actionMessage);
+
+            // ⭐ CRITICAL FIX: Call fetchUserData() after a successful favorite/unfavorite
+            await fetchUserData();
+
         } catch (err) {
             console.error("Favorite API error:", err);
             setError(err.message);

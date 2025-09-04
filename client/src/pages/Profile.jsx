@@ -4,7 +4,9 @@ import { useAuth } from '../store/auth';
 import { toast } from 'sonner';
 
 const Profile = () => {
-    const { user, isLoading, token } = useAuth();
+    // The useAuth hook gives us the current user object and a way to update it.
+    // The updateUser method is the key to solving the issue.
+    const { user, isLoading, token, updateUser } = useAuth();
 
     // State for user profile details
     const [userProfile, setUserProfile] = useState({
@@ -20,6 +22,8 @@ const Profile = () => {
     const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
     // Effect to update user profile details when the user object changes
+    // This hook is now more important as we'll be updating the `user` object
+    // with the `updateUser` function.
     useEffect(() => {
         if (user) {
             setUserProfile({
@@ -42,8 +46,8 @@ const Profile = () => {
 
             setIsHistoryLoading(true);
             try {
-                // Get the last 6 prediction IDs. The slice(-6) method
-                // is used to get the most recent six items from the end of the array.
+                // Get the last 8 prediction IDs. The slice(-8) method is used to
+                // get the most recent eight items from the end of the array.
                 const recentPredictionIds = user.predictions.slice(-8);
                 
                 // Fetch the full prediction objects from the backend
@@ -63,7 +67,6 @@ const Profile = () => {
                 const result = await response.json();
                 if (result.success) {
                     // Sort by creation date to ensure the most recent are displayed first
-                    // The .sort() method with a custom comparison function is used for this.
                     const sortedHistory = result.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                     setHistoryItems(sortedHistory);
                 } else {
@@ -79,7 +82,37 @@ const Profile = () => {
         };
 
         fetchUploadHistory();
-    }, [user?.predictions, token]); // Re-run this effect when user.predictions or token changes
+    }, [user?.predictions, token]); // This dependency array ensures the history is refetched if the predictions array changes.
+
+    // A separate function to handle a user action that updates the user object.
+    // This is an example function you might call from a child component (e.g., a "like" button).
+    // This part is for demonstration and not directly used in this component's render.
+    // The key is to call `updateUser` with the new user object after a successful API call.
+    const handleFavoriteToggle = async (predictionId) => {
+        try {
+            // Assume you have an API endpoint to update favorites
+            const response = await fetch(`/api/v1/users/favorites/${predictionId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update favorites');
+            }
+
+            const updatedUser = await response.json();
+            // This is the crucial step: update the global user state.
+            // This will cause all components that use the `user` object to re-render.
+            updateUser(updatedUser);
+            toast.success('Favorites updated successfully!');
+        } catch (err) {
+            console.error("Error updating favorites:", err);
+            toast.error('Could not update favorites.');
+        }
+    };
 
     // Handle the initial loading state for user data
     if (isLoading || !user) {
