@@ -541,19 +541,69 @@ const html = `
 });
 
 
+// export const resetPassword = asyncHandler(async (req, res) => {
+
+
+// //  const token = req.params;;
+
+
+//   const { token, newPassword, confirmPassword } = req.body;
+
+//   newPassword = newPassword?.trim();
+//   confirmPassword = confirmPassword?.trim();
+
+//   if (!token || !newPassword || !confirmPassword) {
+//     throw new ApiError(400, "Token and passwords are required");
+//   }
+
+//   if (newPassword !== confirmPassword) {
+//     throw new ApiError(400, "Passwords do not match");
+//   }
+
+//   // Verify reset token
+//   let payload;
+//   try {
+//     payload = jwt.verify(token, process.env.RESET_PASSWORD_SECRET);
+//   } catch (err) {
+//     throw new ApiError(400, "Invalid or expired reset token");
+//   }
+
+//   if (payload.purpose !== "resetPassword") {
+//     throw new ApiError(400, "Invalid reset token");
+//   }
+
+//   // Find user
+//   const user = await User.findById(payload._id);
+//   if (!user) {
+//     throw new ApiError(404, "User not found");
+//   }
+
+
+//   user.password = newPassword;
+
+//   // Save updated user
+//   await user.save();
+
+//   // Optionally, invalidate all existing refresh tokens or sessions here
+
+//   return res.status(200).json(new ApiResponse(200, {}, "Password reset successfully"));
+// });
+
+
 export const resetPassword = asyncHandler(async (req, res) => {
-
-
-//  const token = req.params;;
-
-
-  const { token, newPassword, confirmPassword } = req.body;
+  let { token, newPassword, confirmPassword } = req.body;
 
   newPassword = newPassword?.trim();
   confirmPassword = confirmPassword?.trim();
 
+  // Validate inputs
   if (!token || !newPassword || !confirmPassword) {
     throw new ApiError(400, "Token and passwords are required");
+  }
+
+  // Ensure passwords are not empty or only whitespace and meet length requirement
+  if (newPassword.length < 8) {
+    throw new ApiError(400, "Password must be at least 8 characters long and not only whitespace");
   }
 
   if (newPassword !== confirmPassword) {
@@ -578,13 +628,10 @@ export const resetPassword = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-
   user.password = newPassword;
 
   // Save updated user
   await user.save();
-
-  // Optionally, invalidate all existing refresh tokens or sessions here
 
   return res.status(200).json(new ApiResponse(200, {}, "Password reset successfully"));
 });
