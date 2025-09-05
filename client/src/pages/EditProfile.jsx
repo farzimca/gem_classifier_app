@@ -51,6 +51,14 @@ const EditProfile = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // --- 🧑‍💻 ADDED VALIDATION LOGIC ---
+        // Check if a new password is being entered and if it's too short.
+        if (formData.password && formData.password.length < 6) {
+            toast.error("New password must be at least 6 characters long.");
+            return; // Stop the submission process if validation fails
+        }
+        
         setLoading(true);
 
         // Track what was successfully updated to provide a more specific success message
