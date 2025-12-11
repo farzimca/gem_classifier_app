@@ -195,7 +195,7 @@ const AboutPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
           <DeveloperCard
             name="Himanshu Parihar"
-            image="https://media.licdn.com/dms/image/v2/D4D03AQG7gC8OJStToQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1689518512932?e=1759363200&v=beta&t=1x-cmCSN1oWp25FarSCMUgxtxdtbBpf7DR3EruA0xt8"
+            image="https://media.licdn.com/dms/image/v2/D4D03AQG7gC8OJStToQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1689518512932?e=2147483647&v=beta&t=RYOiZvcWgouU7Zw5o4XhEqt567e1pqayEtthBGbAIuI"
             github="https://www.github.com/pariharx7"
             draggable={false}
             linkedin="https://www.linkedin.com/in/himanshuparihar07/"
