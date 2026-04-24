@@ -116,12 +116,12 @@ const FavoriteImagesPage = () => {
     }
 
     return (
-        <div className="bg-gray-100 min-h-screen p-6 font-sans">
+        <div className="bg-gray-100 dark:bg-background min-h-screen p-6 font-sans">
             <div className="container mx-auto">
-                <h1 className="text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">
+                <h1 className="text-3xl font-extrabold text-gray-900 dark:text-foreground mb-2 tracking-tight">
                     Hello, <span className="text-blue-600">{user?.name || 'User'}</span>! 👋
                 </h1>
-                <p className="text-gray-600 mb-6 text-lg">Your curated collection of favorite creations.</p>
+                <p className="text-gray-600 dark:text-gray-300 mb-6 text-lg">Your curated collection of favorite creations.</p>
                 {content}
             </div>
         </div>
