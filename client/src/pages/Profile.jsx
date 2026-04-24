@@ -49,7 +49,7 @@ const Profile = () => {
                 // Get the last 8 prediction IDs. The slice(-8) method is used to
                 // get the most recent eight items from the end of the array.
                 const recentPredictionIds = user.predictions.slice(-8);
-                
+
                 // Fetch the full prediction objects from the backend
                 const response = await fetch('/api/v1/predictions/get-multiple', {
                     method: 'POST',
@@ -120,12 +120,12 @@ const Profile = () => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-purple-50">
+        <div className="min-h-screen flex flex-col bg-gradient-to-b from-white dark:from-background to-purple-50 dark:to-background">
             <main className="flex-grow container mx-auto p-4 sm:p-8 mt-8 mb-8">
-                <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 border border-gray-200">
+                <div className="bg-white dark:bg-bgSecondary rounded-xl shadow-lg p-6 sm:p-8 border border-gray-200">
                     <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-3xl font-bold text-gray-800">Profile</h1>
-                        <Link to="/edit-profile" className="text-purple-600 hover:text-purple-700 font-semibold transition-colors text-lg">
+                        <h1 className="text-3xl font-bold text-gray-800 dark:text-foreground">Profile</h1>
+                        <Link to="/edit-profile" className="text-purple-600 dark:text-purple-500 hover:text-purple-700 font-semibold transition-colors text-lg">
                             Edit
                         </Link>
                     </div>
@@ -134,14 +134,14 @@ const Profile = () => {
                     <div className="flex flex-col items-center mb-10">
                         {/* Profile Picture */}
                         <div className="relative w-40 h-40 rounded-full bg-pink-200 flex items-center justify-center overflow-hidden mb-6 shadow-md border-2 border-purple-100">
-                            <img src={userProfile.profilePicture || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxZWf0l9giN9QZsq3KEs_fZMTy2EiiukBzXg&s"} alt="Profile" className="w-full h-full object-cover" draggable={false}/>
+                            <img src={userProfile.profilePicture || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxZWf0l9giN9QZsq3KEs_fZMTy2EiiukBzXg&s"} alt="Profile" className="w-full h-full object-cover" draggable={false} />
                         </div>
 
                         {/* Information Boxes with Labels */}
                         <div className="w-full max-w-sm space-y-4">
                             {/* Full Name Box */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">Full Name</label>
+                                <label className="block text-sm font-medium text-gray-600 dark:text-foreground mb-1">Full Name</label>
                                 <div className="bg-gray-100 text-gray-800 font-medium px-4 py-3 rounded-lg text-center shadow-sm border border-gray-200">
                                     {userProfile.fullName}
                                 </div>
@@ -149,7 +149,7 @@ const Profile = () => {
 
                             {/* Username Box */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">Username</label>
+                                <label className="block text-sm font-medium text-gray-600 dark:text-foreground mb-1">Username</label>
                                 <div className="bg-gray-100 text-gray-800 font-medium px-4 py-3 rounded-lg text-center shadow-sm border border-gray-200">
                                     {userProfile.username}
                                 </div>
@@ -157,7 +157,7 @@ const Profile = () => {
 
                             {/* Email Box */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                                <label className="block text-sm font-medium text-gray-600 dark:text-foreground mb-1">Email</label>
                                 <div className="bg-gray-100 text-gray-800 font-medium px-4 py-3 rounded-lg text-center shadow-sm border border-gray-200">
                                     {userProfile.email}
                                 </div>
@@ -172,7 +172,7 @@ const Profile = () => {
 
                     {/* Upload History */}
                     <div className="mt-12">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">Upload History</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-foreground mb-6">Upload History</h2>
                         <p className="text-xl text-gray-500 mb-6">Recent Uploads by <span className="text-amber-500">{userProfile.username} </span></p>
                         {isHistoryLoading ? (
                             <div className="text-center text-gray-500 p-8">Loading history...</div>
