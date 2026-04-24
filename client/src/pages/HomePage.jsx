@@ -15,7 +15,7 @@ const HomePage = () => {
   return (
     <div className="bg-gray-100 border-gray-300">
       <HeroSection onStartPrediction={handleStartPrediction} />
-      
+
       {/* 3. Assign the ref to the Prediction component's wrapper */}
       <div ref={predictionRef}>
         <Prediction />
