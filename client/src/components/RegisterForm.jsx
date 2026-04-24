@@ -35,7 +35,7 @@ const UserIcon = ({ className }) => (
 );
 
 const IdCardIcon = ({ className }) => (
-     <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
         <path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM6 8h8v2H6V8zm12 8H6v-2h12v2zm-4-4H6v-2h8v2z" />
     </svg>
 );
@@ -58,7 +58,7 @@ const RegisterForm = () => {
         password: false,
         confirmPassword: false,
     });
-    
+
     // State for loading feedback only
     const [loading, setLoading] = useState(false);
 
@@ -112,25 +112,26 @@ const RegisterForm = () => {
                 method: 'POST',
                 body: data,
             });
-            
-            const responseText = await response.text();
 
+            const responseText = await response.text();
             if (!response.ok) {
                 try {
+                    console.log(responseText)
                     const errorJson = JSON.parse(responseText);
                     toast.error(errorJson.message || 'An error occurred during registration.');
                     throw new Error(errorJson.message || 'An error occurred during registration.');
                 } catch (parseError) {
+                    console.log(responseText)
                     toast.error(responseText || 'An unknown server error occurred.');
                     throw new Error(responseText || 'An unknown server error occurred.');
                 }
             }
-            
+
             const result = responseText ? JSON.parse(responseText) : {};
             const successMessage = result.message || 'Registration successful! Please log in.';
-            
+
             toast.success(successMessage);
-            
+
             setFormData({
                 name: '',
                 username: '',
@@ -140,7 +141,7 @@ const RegisterForm = () => {
                 avatar: null,
             });
 
-            navigate('/login'); 
+            navigate('/login');
 
         } catch (err) {
             toast.error(err.message);
@@ -151,16 +152,16 @@ const RegisterForm = () => {
     };
 
     return (
-        <div className="bg-white p-8 rounded-2xl shadow-lg border-2 border-gray-200 w-full max-w-lg">
-            <h1 className="text-3xl font-bold text-center text-gray-800">Create Account</h1>
+        <div className="bg- dark:bg-background p-8 rounded-2xl shadow-lg border-2 border-gray-200 dark:border-backgSubtle w-full max-w-lg">
+            <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-foreground">Create Account</h1>
             <h2 className="text-lg text-center text-gray-500 mt-2">Join the community!</h2>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-4">
                 {/* Full Name Input */}
                 <div className="relative">
-                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                      <IdCardIcon className="text-gray-400" />
-                   </span>
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                        <IdCardIcon className="text-gray-400" />
+                    </span>
                     <input
                         type="text"
                         name="name"
@@ -259,7 +260,7 @@ const RegisterForm = () => {
                         {showPassword.confirmPassword ? <EyeSlashIcon className="text-gray-600" /> : <EyeIcon className="text-gray-600" />}
                     </span>
                 </div>
-                
+
                 <button
                     type="submit"
                     disabled={loading}
@@ -269,9 +270,9 @@ const RegisterForm = () => {
                 </button>
             </form>
 
-            <p className="text-center text-sm text-gray-600 mt-6">
+            <p className="text-center text-sm text-gray-600 dark:text-foreground mt-6">
                 Already have an account?{' '}
-                <a href="/login" className="font-medium text-purple-600 hover:underline">
+                <a href="/login" className="font-medium text-purple-600 dark:text-purple-400 hover:underline">
                     Log In
                 </a>
             </p>
