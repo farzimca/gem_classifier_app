@@ -5,10 +5,10 @@ import ForgotPasswordForm from '../components/ForgotPasswordForm';
 const ForgotPasswordPage = () => {
     return (
         <>
-        <header className="text-3xl font-bold text-center p-4">GEMX</header>
-        <div className="bg-gray-200 min-h-screen p-8 flex flex-col items-center justify-center">
-            <ForgotPasswordForm />
-        </div>
+            <header className="text-3xl font-bold text-center p-4">GEMX</header>
+            <div className="bg-gray-200 dark:bg-background min-h-screen p-8 flex flex-col items-center justify-center">
+                <ForgotPasswordForm />
+            </div>
             <Footer />
         </>
     );

@@ -60,8 +60,8 @@ const ForgotPasswordForm = () => {
     };
 
     return (
-        <div className="bg-white p-8 rounded-2xl shadow-lg border-2 border-gray-200 w-full max-w-lg">
-            <h1 className="text-3xl font-bold text-center text-gray-800">Forgot Password?</h1>
+        <div className="bg-white dark:bg-background p-8 rounded-2xl shadow-lg border-2 border-gray-200 dark:border-backgSubtle w-full max-w-lg">
+            <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-foreground">Forgot Password?</h1>
             <h2 className="text-lg text-center text-gray-500 mt-2">Enter your email to receive a reset link.</h2>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-4">
@@ -91,9 +91,9 @@ const ForgotPasswordForm = () => {
                 </button>
             </form>
 
-            <p className="text-center text-sm text-gray-600 mt-6">
+            <p className="text-center text-sm text-gray-600 dark:text-foreground mt-6">
                 Remember your password?{' '}
-                <a href="/login" className="font-medium text-purple-600 hover:underline">
+                <a href="/login" className="font-medium text-purple-600 dark:text-purple-400 hover:underline">
                     Log in
                 </a>
             </p>

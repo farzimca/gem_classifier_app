@@ -11,7 +11,7 @@ const RegisterPage = () => {
                     GEMX
                 </Link>
             </header>
-            <div className="bg-gray-200 min-h-screen p-8 flex flex-col items-center justify-center">
+            <div className="bg-gray-200 dark:bg-background min-h-screen p-8 flex flex-col items-center justify-center">
                 <RegisterForm />
             </div>
             <Footer />

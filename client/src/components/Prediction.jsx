@@ -84,16 +84,16 @@ const CameraCapture = ({ onCapture, onCancel }) => {
                     onCancel();
                 }
             }
+        }
+
+        getCameraStream();
+
+        return () => {
+            if (videoRef.current && videoRef.current.srcObject) {
+                videoRef.current.srcObject.getTracks().forEach(track => track.stop());
             }
-
-            getCameraStream();
-
-            return () => {
-                if (videoRef.current && videoRef.current.srcObject) {
-                    videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-                }
-            };
-        }, [onCancel]);
+        };
+    }, [onCancel]);
 
     const handleCapture = () => {
         if (videoRef.current && canvasRef.current) {
@@ -315,15 +315,15 @@ const Prediction = () => {
 
     return (
         <>
-            <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 flex flex-col items-center justify-center p-4 sm:p-8">
+            <div className="min-h-screen bg-gradient-to-b from-white dark:from-background to-purple-50 dark:to-background flex flex-col items-center justify-center p-4 sm:p-8">
                 <div className="text-center mb-12">
-                    <h1 className="text-5xl font-bold text-gray-800">Gemstone Prediction</h1>
+                    <h1 className="text-5xl font-bold text-gray-800 dark:text-purple-700">Gemstone Prediction</h1>
                     <p className="text-lg text-gray-500 mt-2">Upload an image to identify your gem.</p>
                 </div>
 
                 <div className="flex flex-col lg:flex-row items-center justify-center gap-8 w-full max-w-5xl">
                     <div
-                        className="w-full lg:w-1/3 h-80 bg-white rounded-2xl border-2 border-dashed border-gray-300 flex flex-col justify-center items-center text-center p-4 cursor-pointer group hover:border-purple-400 transition-all duration-300 shadow-sm"
+                        className="w-full lg:w-1/3 h-80 bg-white dark:bg-bgSecondary rounded-2xl border-2 border-dashed border-gray-300 flex flex-col justify-center items-center text-center p-4 cursor-pointer group hover:border-purple-400 transition-all duration-300 shadow-sm"
                         onClick={!previewUrl ? () => setShowUploadOptions(true) : null}
                     >
                         <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
@@ -333,7 +333,7 @@ const Prediction = () => {
                                 {predictionResult && (
                                     <div className="absolute inset-0 bg-black bg-opacity-60 flex flex-col items-center justify-center rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" onClick={handleReset}>
                                         <ResetIcon />
-                                        <p className="text-white font-semibold">Predict Another</p>
+                                        <p className="text-white dark:text-foreground font-semibold">Predict Another</p>
                                     </div>
                                 )}
                             </div>
@@ -352,7 +352,7 @@ const Prediction = () => {
                         </button>
                     </div>
 
-                    <div className="w-full lg:w-1/3 h-80 p-2 bg-white rounded-2xl shadow-lg flex flex-col justify-center items-center">
+                    <div className="w-full lg:w-1/3 h-80 p-2 bg-white dark:bg-bgSecondary dark:border-1 dark:border-backgSubtle rounded-2xl shadow-lg flex flex-col justify-center items-center">
                         {predictionResult ? (
                             <div className="relative w-full h-full text-center p-4">
                                 <img src={predictionResult.image} alt="Gem Prediction Result" className="w-full h-4/6 object-contain rounded-xl" />
@@ -398,10 +398,10 @@ const Prediction = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40" onClick={() => setShowUploadOptions(false)}>
                     <div className="bg-white rounded-lg p-8 space-y-4" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-xl font-semibold text-center mb-4">Choose an option</h3>
-                        <button onClick={() => { setShowCamera(true); setShowUploadOptions(false); }} className="w-full flex items-center justify-center cursor-pointer px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-lg font-medium">
+                        <button onClick={() => { setShowCamera(true); setShowUploadOptions(false); }} className="w-full flex items-center justify-center cursor-pointer px-6 py-3 bg-gray-100 dark:bg-background hover:bg-gray-200 rounded-lg text-lg font-medium">
                             <CameraIcon /> Open Camera
                         </button>
-                        <button onClick={triggerFileInput} className="w-full cursor-pointer flex items-center justify-center px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-lg font-medium">
+                        <button onClick={triggerFileInput} className="w-full cursor-pointer flex items-center justify-center px-6 py-3 bg-gray-100 dark:bg-background hover:bg-gray-200 rounded-lg text-lg font-medium">
                             <FileUploadIcon /> Upload File
                         </button>
                     </div>

@@ -58,7 +58,7 @@ const EditProfile = () => {
             toast.error("New password must be at least 6 characters long.");
             return; // Stop the submission process if validation fails
         }
-        
+
         setLoading(true);
 
         // Track what was successfully updated to provide a more specific success message
@@ -153,10 +153,10 @@ const EditProfile = () => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-purple-50">
+        <div className="min-h-screen flex flex-col bg-gradient-to-b from-white dark:from-background to-purple-50 dark:to-background">
             <main className="flex-grow container mx-auto p-4 sm:p-8 mt-8 mb-8">
-                <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 border border-gray-200">
-                    <h1 className="text-3xl font-bold text-gray-800 text-center mb-10">Update Profile</h1>
+                <div className="bg-white dark:bg-bgSecondary rounded-xl shadow-lg p-6 sm:p-8 border border-gray-200">
+                    <h1 className="text-3xl font-bold text-gray-800 dark:text-foreground text-center mb-10">Update Profile</h1>
 
                     <form onSubmit={handleSubmit} className="flex flex-col items-center">
                         {/* Profile Picture */}
@@ -214,7 +214,7 @@ const EditProfile = () => {
                                 {showOldPassword ? <AiFillEye size={20} /> : <AiFillEyeInvisible size={20} />}
                             </button>
                         </div>
-                        
+
                         {/* New Password */}
                         <p className="text-sm font-medium text-gray-600 w-full max-w-sm mt-4 mb-1 text-center">New Password</p>
                         <div className="relative w-full max-w-sm">
@@ -241,7 +241,7 @@ const EditProfile = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full max-w-sm cursor-pointer bg-yellow-400 text-gray-800 font-bold px-4 py-3 rounded-lg shadow-md hover:bg-yellow-500 transition-colors transform hover:scale-105 disabled:opacity-50"
+                            className="w-full max-w-sm cursor-pointer bg-purple-600 text-white/90 font-bold px-4 py-3 rounded-lg shadow-md hover:bg-yellow-500 transition-colors transform hover:scale-105 disabled:opacity-50"
                         >
                             {loading ? "Updating..." : "Update Profile"}
                         </button>

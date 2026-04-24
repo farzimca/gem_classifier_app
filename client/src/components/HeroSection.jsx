@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 
 // --- Animated SVG Gemstone Illustration ---
 const GemstoneIllustration = () => (
@@ -32,7 +33,7 @@ const GemstoneIllustration = () => (
 
 // --- Floating Orb Component ---
 const Orb = ({ className, style }) => (
-    <div className={`absolute rounded-full filter blur-3xl ${className}`} style={style}></div>
+  <div className={`absolute rounded-full filter blur-3xl ${className}`} style={style}></div>
 );
 
 
@@ -64,6 +65,10 @@ const HeroSection = ({ onStartPrediction }) => {
     onStartPrediction();
   };
 
+  const { theme, setTheme } = useTheme();
+  let themeVar = theme;
+  themeVar = theme === "dark" ? "linear-gradient(-45deg, #0f172a 0%, #171717 35%, #111827 70%, #0a0a0a 100%)" : "linear-gradient(-45deg, #f3e8ff, #fce7f3, #e0f2fe, #f3e8ff)";
+
   return (
     <>
       <style>
@@ -89,7 +94,7 @@ const HeroSection = ({ onStartPrediction }) => {
             100% { background-position: 0% 50%; }
           }
           .animated-gradient {
-            background: linear-gradient(-45deg, #f3e8ff, #fce7f3, #e0f2fe, #f3e8ff);
+            background:${themeVar};
             background-size: 400% 400%;
             animation: gradient-shift 15s ease infinite;
           }
@@ -105,11 +110,11 @@ const HeroSection = ({ onStartPrediction }) => {
       </style>
       <div className="relative min-h-screen w-full animated-gradient flex items-center justify-center p-8 lg:p-12 overflow-hidden">
         {/* Decorative Floating Orbs */}
-        <Orb className="w-64 h-64 bg-purple-200 opacity-50 top-1/4 left-1/4 orb-float" style={{ animationDelay: '0s' }} />
-        <Orb className="w-48 h-48 bg-pink-200 opacity-50 bottom-1/4 right-1/4 orb-float" style={{ animationDelay: '2s' }} />
+        <Orb className="w-64 h-64 bg-purple-200 dark:bg-white/10  opacity-50 top-1/4 left-1/4 orb-float" style={{ animationDelay: '0s' }} />
+        <Orb className="w-48 h-48 bg-pink-200 dark:bg-white/10 opacity-50 bottom-1/4 right-1/4 orb-float" style={{ animationDelay: '2s' }} />
 
         <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center z-10">
-          
+
           {/* Parallax SVG Illustration Section */}
           <div className="h-[350px] sm:h-[450px] lg:h-[600px] w-full animate-fade-in-up transition-transform duration-500 ease-out" style={{ ...parallaxStyle(-0.02), animationDelay: '0.2s' }}>
             <GemstoneIllustration />
@@ -117,22 +122,22 @@ const HeroSection = ({ onStartPrediction }) => {
 
           {/* Parallax Text Content Section */}
           <div className="text-center lg:text-left transition-transform duration-500 ease-out" style={parallaxStyle(0.01)}>
-            <h1 
+            <h1
               className="text-6xl sm:text-7xl md:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 mb-6 tracking-tight animate-fade-in-up transition-all duration-300 hover:scale-105 hover:drop-shadow-lg"
               style={{ animationDelay: '0.4s' }}
             >
               GEMX
             </h1>
-            <p className="text-2xl sm:text-3xl font-light text-gray-600 mb-4 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            <p className="text-2xl sm:text-3xl font-light text-gray-600 dark:text-foreground mb-4 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
               Unlocking the Story in Every Stone.
             </p>
-            <p className="text-lg sm:text-xl font-light text-gray-600 mb-8 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
+            <p className="text-lg sm:text-xl font-light text-gray-600 dark:text-foreground mb-8 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
               The essential digital tool for connoisseurs and creators.
             </p>
-            <p className="text-xl sm:text-2xl font-semibold text-purple-800 mb-10 animate-fade-in-up" style={{ animationDelay: '1.0s' }}>
+            <p className="text-xl sm:text-2xl font-semibold text-purple-800 dark:text-purple-600 mb-10 animate-fade-in-up" style={{ animationDelay: '1.0s' }}>
               Precision, Speed, and Elegance. Redefined.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up" style={{ animationDelay: '1.2s' }}>
               <a
                 href="#prediction-section"
@@ -144,7 +149,7 @@ const HeroSection = ({ onStartPrediction }) => {
               </a>
               <a
                 href="/about"
-                className="inline-flex items-center justify-center text-lg font-bold px-8 py-4 rounded-full text-gray-800 bg-white shadow-lg border border-gray-200 transform hover:scale-105 hover:shadow-xl transition-all duration-300"
+                className="inline-flex items-center justify-center text-lg font-bold px-8 py-4 rounded-full text-gray-800 bg-white dark:bg-backgSubtle shadow-lg border border-gray-200 transform hover:scale-105 hover:shadow-xl transition-all duration-300"
               >
                 Learn More
               </a>
