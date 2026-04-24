@@ -20,7 +20,7 @@ const LinkedinIcon = () => (
 const DeveloperCard = ({ name, image, github, linkedin }) => (
   <motion.div
     whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(128, 90, 213, 0.25)" }}
-    className="bg-white rounded-lg p-6 text-center cursor-pointer transition-shadow"
+    className="bg-white dark:bg-backgSubtle rounded-lg p-6 text-center cursor-pointer transition-shadow"
   >
     <img
       src={image}
@@ -42,7 +42,7 @@ const DeveloperCard = ({ name, image, github, linkedin }) => (
 
 const AboutPage = () => {
   return (
-    <div className="bg-white text-gray-800">
+    <div className="bg-white text-gray-800 dark:bg-background dark:text-foreground">
       {/* Header Section */}
       <section className="max-w-6xl mx-auto px-6 py-16 text-center">
         <motion.h1
@@ -57,7 +57,7 @@ const AboutPage = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="text-lg text-gray-600 max-w-3xl mx-auto"
+          className="text-lg text-gray-600 dark:text-foreground max-w-3xl mx-auto"
         >
           Discover the story, technology, and team behind our mission to revolutionize gemstone classification.
         </motion.p>
@@ -77,7 +77,7 @@ const AboutPage = () => {
       </section>
 
       {/* The Idea Section */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-gray-50 dark:bg-background dark:text-foreground py-16">
         <div className="max-w-6xl mx-auto px-6 md:grid md:grid-cols-2 md:gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -87,10 +87,10 @@ const AboutPage = () => {
             className=""
           >
             <h2 className="text-4xl font-bold mb-4">The Spark of an Idea</h2>
-            <p className="text-lg text-gray-700 mb-4 leading-relaxed">
+            <p className="text-lg text-gray-700 mb-4 leading-relaxed dark:text-foreground">
               GEMX was born from a fascination with the intersection of natural beauty and artificial intelligence. Our goal is to democratize gemology, making it accessible to everyone. By leveraging machine learning, we can identify gemstones from a simple image, a task that traditionally requires expert knowledge and specialized tools.
             </p>
-            <p className="text-lg text-gray-700 leading-relaxed">
+            <p className="text-lg text-gray-700 leading-relaxed dark:text-foreground">
               To build our model, we embarked on an extensive data collection journey, gathering a primary dataset from local shops, gem stores, and high-quality online repositories to ensure our AI is trained on a diverse and accurate range of examples.
             </p>
           </motion.div>
@@ -138,9 +138,9 @@ const AboutPage = () => {
               key={index}
               whileHover={{ y: -8, boxShadow: '0 8px 20px rgba(128, 90, 213, 0.2)' }}
               transition={{ duration: 0.3 }}
-              className="bg-white p-6 rounded-xl shadow-md cursor-default"
+              className="bg-white dark:bg-backgSubtle p-6 rounded-xl shadow-md cursor-default"
             >
-              <h3 className="text-2xl font-semibold mb-2">{title}</h3>
+              <h3 className="text-2xl font-semibold mb-2 dark:text-background">{title}</h3>
               <p className="text-gray-600">{desc}</p>
             </motion.div>
           ))}
@@ -148,7 +148,7 @@ const AboutPage = () => {
       </section>
 
       {/* Mentor Section with original bg color */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-gray-50 dark:bg-background dark:text-foreground py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <motion.h2
             initial={{ opacity: 0, scale: 0.9 }}
@@ -175,7 +175,7 @@ const AboutPage = () => {
             </a>
           </h3>
           <p className="text-purple-600 font-medium mb-3">Jammu University</p>
-          <p className="max-w-xl mx-auto leading-relaxed text-gray-700">
+          <p className="max-w-xl mx-auto leading-relaxed text-gray-700 dark:text-foreground">
             We are immensely grateful for the invaluable guidance and support provided by Prof. Vinod Sharma, whose expertise has been instrumental in shaping this project.
           </p>
         </div>
