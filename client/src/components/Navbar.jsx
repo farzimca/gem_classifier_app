@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../store/auth';
+import ModeToggle from './ModeToggle';
 
 // --- SVG Icons ---
 const MenuIcon = () => (
-  <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <svg className={`w-7 h-7 rotate-0`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
   </svg>
 );
 
 const CloseIcon = () => (
-  <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <svg className="w-6 h-6 transition-all duration-200 rotate-90" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
   </svg>
 );
@@ -38,13 +39,14 @@ const Navbar = () => {
 
   return (
     <header className="bg-white/80 dark:bg-background dark:border-b dark:border-purple-600 backdrop-blur-md shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto flex justify-between items-center px-1 py-1">
+      <div className="container mx-auto flex justify-between items-center md:px-2 md:py-1 px-5 py-0.5">
 
         {/* Logo */}
-        <NavLink to="/" className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 tracking-tight">
+        <NavLink to="/" className="text-xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 tracking-tight">
           GEMX
         </NavLink>
         <div className='gap-4 flex flex-row-reverse md:hidden'>
+          <ModeToggle />
           {/* Hamburger Menu Button (visible on mobile) */}
           <div className="md:hidden">
             <button onClick={toggleMenu} className="text-gray-700 dark:text-foreground hover:text-purple-600 transition-colors size-5">
@@ -61,15 +63,14 @@ const Navbar = () => {
           <NavLink to="/about" className={activeLinkClass}>
             ABOUT
           </NavLink>
-
           {isLoggedIn ? (
-            <>
+            <div className='flex gap-4 items-center-safe relative pr-2 md:pr-7'>
               {/* Profile Link with Avatar/Icon */}
               <NavLink
                 to="/profile"
                 onClick={toggleMenu}
                 className={({ isActive }) =>
-                  `p-1 rounded-full transition-colors duration-200 
+                  `px-1 rounded-full transition-colors duration-200 
                   ${isActive ? 'bg-purple-100 ring-2 ring-purple-500' : 'hover:bg-gray-100'}`
                 }
               >
@@ -78,29 +79,33 @@ const Navbar = () => {
                   <img
                     src={user.avatar}
                     alt="User Profile"
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="w-5 h-5 p-1 my-1 rounded-full object-cover"
                     draggable={false}
                   />
                 ) : (
-                  <UserIcon className="w-8 h-8 text-gray-700 dark:text-foreground" />
+                  <UserIcon className="w-5 h-5 p-1 my-1 text-gray-700 dark:border dark:border-purple-600 dark:rounded-full" />
                 )}
               </NavLink>
               <NavLink
                 to="/logout"
-                className="px-5 py-2 bg-red-600 text-white font-semibold rounded-lg shadow hover:bg-red-700 transition-all transform hover:scale-105"
+                className="px-4 py-1 bg-red-600 text-white font-semibold rounded-lg shadow hover:bg-red-700 transition-all transform hover:scale-105"
               >
                 LOG OUT
               </NavLink>
-            </>
+              <ModeToggle />
+            </div>
           ) : (
-            <>
+            <div className='flex gap-4 items-baseline relative pr-2 md:pr-4'>
               <NavLink to="/register" className={activeLinkClass}>
                 REGISTER
               </NavLink>
-              <NavLink to="/login" className="px-5 py-1 bg-purple-600 text-white font-semibold rounded-lg shadow hover:bg-purple-700 transition-all transform hover:scale-105">
+              <NavLink to="/login" className="px-4 py-1 mr-2.5 bg-purple-600 text-white font-semibold rounded-lg shadow hover:bg-purple-700 transition-all transform hover:scale-105">
                 LOG IN
               </NavLink>
-            </>
+              {/* <span className={`${activeLinkClass} border-1 border-black size-9 bg-blue-600`}> */}
+              <ModeToggle />
+              {/* </span> */}
+            </div>
           )}
         </nav>
       </div>
