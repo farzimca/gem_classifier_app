@@ -39,7 +39,7 @@ const Navbar = () => {
 
   return (
     <header className="bg-white/80 dark:bg-background dark:border-b dark:border-purple-600 backdrop-blur-md shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto flex justify-between items-center md:px-2 md:py-1 px-5 py-0.5">
+      <div className="container mx-auto flex justify-between items-center md:px-2 md:py-1 px-5 py-2.5">
 
         {/* Logo */}
         <NavLink to="/" className="text-xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 tracking-tight">
