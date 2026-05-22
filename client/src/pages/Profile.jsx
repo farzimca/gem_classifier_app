@@ -133,7 +133,7 @@ const Profile = () => {
                     {/* Profile Details */}
                     <div className="flex flex-col items-center mb-10">
                         {/* Profile Picture */}
-                        <div className="relative w-40 h-40 rounded-full bg-pink-200 flex items-center justify-center overflow-hidden mb-6 shadow-md border-2 border-purple-100">
+                        <div className="relative w-40 h-40 rounded-full bg-pink-200 flex items-center justify-center overflow-hidden mb-6 shadow-md border-2 border-purple-100 dark:border-purple-600">
                             <img src={userProfile.profilePicture || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxZWf0l9giN9QZsq3KEs_fZMTy2EiiukBzXg&s"} alt="Profile" className="w-full h-full object-cover" draggable={false} />
                         </div>
 

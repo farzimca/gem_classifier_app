@@ -38,10 +38,10 @@ const ModeToggle = () => {
 
     return (
         <button onClick={SWITCH_THEME}
-            className="fixed bottom-3 lg:bottom-5 right-2 lg:right-5 flex size-10 md:size-12 z-10 cursor-pointer items-center justify-center rounded-xl p-3 border border-neutral-100 dark:border-neutral-800 dark:bg-neutral-200 bg-neutral-900"
+            className="absolute top-3.5 right-12 md:-right-2 md:top-1  mr-1 flex size-6 z-10 cursor-pointer items-center justify-center rounded-xl px-1 py-1 border bg-white/80 border-white/80 dark:border-neutral-800 dark:bg-background"
         >
-            <FaSun className="absolute inset-0 m-auto size-9 p-1 shrink-0 scale-100 text-neutral-200 transition-all duration-300 dark:scale-0 dark:rotate-45 " />
-            <FaMoon className="absolute inset-0 m-auto size-9 p-1 shrink-0 scale-0 rotate-45 text-neutral-500 transition-all duration-300 dark:scale-100 dark:rotate-0 dark:text-neutral-900" />
+            <FaMoon className="absolute inset-0 m-auto size-5 shrink-0 scale-100 text-neutral-700 transition-all duration-200 dark:scale-0 dark:rotate-77" />
+            <FaSun className="absolute inset-0 m-auto size-5 shrink-0 scale-0 rotate-77 text-white transition-all duration-200 dark:scale-100 dark:rotate-0 " />
         </button>
     );
 };
